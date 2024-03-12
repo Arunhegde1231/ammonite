@@ -46,7 +46,7 @@ class _HomescreenState extends State<Homescreen> {
     } catch (error) {
       print('Error fetching videos: $error');
       setState(() {
-        errorMessage = 'Error fetching videos';
+        errorMessage = 'Error fetching videos $error';
         loading = false;
       });
     }
@@ -54,46 +54,94 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Ammonite'),
-      backgroundColor: Color.fromARGB(255, 34, 187, 136),
-      centerTitle: true,
-    ),
-
-    body:RefreshIndicator(
-      onRefresh: _refreshVideos,
-      child : loading
-        ? Center(child: CircularProgressIndicator())
-        : errorMessage.isNotEmpty
-            ? Center(child: Text(errorMessage))
-            : videos.isEmpty
-                ? Center(child: Text('No videos found'))
-                : ListView.builder(
-                    itemCount: videos.length,
-                    itemBuilder: (context, index) {
-                      final video = videos[index];
-                      final thumbnailURL = 'https://tilvids.com${video['thumbnailPath']}';
-                      return ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.network(thumbnailURL, width: double.infinity, height: 200, fit: BoxFit.cover),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(video['name'] ?? '', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'RobotoMono'),)
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ammonite'),
+        backgroundColor: Color.fromARGB(255, 34, 187, 136),
+        centerTitle: true,
+      ),
+      body: RefreshIndicator(
+        onRefresh: _refreshVideos,
+        child: loading
+            ? Center(child: CircularProgressIndicator())
+            : errorMessage.isNotEmpty
+                ? Center(child: Text(errorMessage))
+                : videos.isEmpty
+                    ? Center(child: Text('No videos found'))
+                    : ListView.builder(
+                        itemCount: videos.length,
+                        itemBuilder: (context, index) {
+                          final video = videos[index];
+                          final thumbnailURL = 'https://tilvids.com${video['thumbnailPath']}';
+                          final channelData = video['channel'];
+                          final channelName = channelData != null ? channelData['displayName'] : '';
+                          final channelAvatar = channelData != null ? 'https://tilvids.com${channelData['avatar']['path']}' : '';
+                          return ListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.network(
+                                  thumbnailURL,
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    children: [
+                                      if (channelAvatar.isNotEmpty)
+                                        CircleAvatar(
+                                          radius: 20,
+                                          backgroundImage: NetworkImage(channelAvatar),
+                                        ),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              video['name'] ?? '',
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'RobotoMono',
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 3,
+                                            ),
+                                            SizedBox(height: 2),
+                                            if (channelName.isNotEmpty)
+                                              Text(
+                                                '$channelName',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 48),
+                                  child: Row(
+                                    children: [
+                                      Text('👁️: ${video['views'] ?? 0}'),
+                                      SizedBox(width: 16),
+                                      Text('👍: ${video['likes'] ?? 0}'),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 7),
-                            Text('Views : ${video['views'] ?? 0}'),
-                            Text('👍 : ${video['likes'] ?? 0}'),
-                            
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-    )
-  );
-}
+                          );
+                        },
+                      ),
+      ),
+    );
+  }
 
 }
