@@ -58,7 +58,6 @@ class _HomescreenState extends State<Homescreen> {
       appBar: AppBar(
         title: const Text('Ammonite'),
         backgroundColor: Color.fromARGB(255, 34, 187, 136),
-        centerTitle: true,
       ),
       body: RefreshIndicator(
         onRefresh: _refreshVideos,
