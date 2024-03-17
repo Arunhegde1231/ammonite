@@ -209,7 +209,7 @@ class _HomescreenState extends State<Homescreen> {
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, style: BorderStyle.solid),
+          border: Border.all(color: Colors.black, style: BorderStyle.solid, strokeAlign: BorderSide.strokeAlignInside, width: 1.0) ,
           borderRadius: BorderRadius.circular(20),
         ),
         child: SizedBox(
