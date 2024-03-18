@@ -114,7 +114,6 @@ class _HomescreenState extends State<Homescreen> {
           slivers: <Widget>[
             const SliverAppBar(
               title: Text('Home'),
-              backgroundColor: Color.fromARGB(174, 34, 187, 136),
               floating: true,
               snap: true,
             ),
