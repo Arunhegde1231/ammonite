@@ -105,15 +105,7 @@ class _HomescreenState extends State<Homescreen> {
             icon: Icon(Icons.folder_outlined),
             label: "Library"
           ),
-        ],
-        onDestinationSelected: (int index){
-          switch(index){
-            case 0:
-            Navigator.pushNamed(context, '/home');
-            case 1:
-            Navigator.pushNamed(context, '/discover');
-          }
-        },
+        ]
       ),
       body: RefreshIndicator(
         onRefresh: _refreshVideos,
