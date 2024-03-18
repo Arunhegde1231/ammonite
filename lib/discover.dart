@@ -147,7 +147,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(15),
         ),
         child: SizedBox(
