@@ -106,7 +106,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           NavigationDestination(
             selectedIcon: Icon(Icons.explore),
             icon: Icon(Icons.explore_outlined),
-            label: "Discover"
+            label: "Discover",
+            enabled: true,
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.search_rounded),
@@ -123,7 +124,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             icon: Icon(Icons.folder_outlined),
             label: "Library"
           ),
-        ]
+        ],
+        onDestinationSelected: (int index){
+          switch(index){
+            case 0:
+            Navigator.pushNamed(context, '/home');
+            case 1:
+            Navigator.pushNamed(context, '/discover');
+          }
+        },
       ),
       appBar: AppBar(
         title: const Text('Discover'),
