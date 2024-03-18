@@ -96,9 +96,37 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: "Home"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.explore),
+            icon: Icon(Icons.explore_outlined),
+            label: "Discover"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.search_rounded),
+            icon: Icon(Icons.search_outlined),
+            label: "Search"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.notifications),
+            icon: Icon(Icons.notifications_outlined),
+            label: "Notifications"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.folder),
+            icon: Icon(Icons.folder_outlined),
+            label: "Library"
+          ),
+        ]
+      ),
       appBar: AppBar(
         title: const Text('Discover'),
-        backgroundColor: const Color.fromARGB(174, 34, 187, 136),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -119,7 +147,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, style: BorderStyle.solid),
+          border: Border.all(color: Colors.white, style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(15),
         ),
         child: SizedBox(
@@ -128,8 +156,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             onPressed: () {},
             label: Text(category),
             icon: Icon(iconData),
-            elevation: 0,
-            backgroundColor: Colors.white,
+            elevation: 5,
+            backgroundColor: Color.fromARGB(255, 229, 209, 236),
             foregroundColor: Colors.black,
           ),
         ),
