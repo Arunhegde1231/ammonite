@@ -78,6 +78,35 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: "Home"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.explore),
+            icon: Icon(Icons.explore_outlined),
+            label: "Discover"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.search_rounded),
+            icon: Icon(Icons.search_outlined),
+            label: "Search"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.notifications),
+            icon: Icon(Icons.notifications_outlined),
+            label: "Notifications"
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.folder),
+            icon: Icon(Icons.folder_outlined),
+            label: "Library"
+          ),
+        ]
+      ),
       body: RefreshIndicator(
         onRefresh: _refreshVideos,
         child: CustomScrollView(
@@ -184,6 +213,10 @@ class _HomescreenState extends State<Homescreen> {
                                           const Icon(Icons.thumb_up_outlined),
                                           const SizedBox(width: 6),
                                           Text('${video['likes'] ?? 0}'),
+                                          const SizedBox(width: 6),
+                                          const Icon(Icons.thumb_down_outlined),
+                                          const SizedBox(width: 6),
+                                          Text('${video['dislikes'] ?? 0}'),
                                           const SizedBox(width: 8),
                                           const Text('•'),
                                           const SizedBox(width: 8),
