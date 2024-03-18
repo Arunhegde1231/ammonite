@@ -1,18 +1,21 @@
-import 'package:ammonite/Screens/home.dart';
+import 'package:ammonite/discover.dart';
+import 'package:ammonite/home.dart';
+import 'package:ammonite/trending.dart';
 import 'package:flutter/material.dart';
 
-void main(){
-  runApp(const MyApp());
+void main() {
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}):super(key: key); 
- 
-
-@override
-Widget build(BuildContext context){
-  return const MaterialApp(
-    home: Homescreen(),
-  );
-}
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      routes: {
+        '/': (context) => Homescreen(),
+        '/discover': (context) => DiscoverScreen(),
+        '/trending': (context) => TrendingScreen(),
+      },
+    );
+  }
 }
