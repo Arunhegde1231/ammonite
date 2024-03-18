@@ -2,7 +2,6 @@ import 'package:ammonite/discover.dart';
 import 'package:ammonite/home.dart';
 import 'package:ammonite/trending.dart';
 import 'package:flutter/material.dart';
-
 void main() {
   runApp(MyApp());
 }
