@@ -105,7 +105,15 @@ class _HomescreenState extends State<Homescreen> {
             icon: Icon(Icons.folder_outlined),
             label: "Library"
           ),
-        ]
+        ],
+        onDestinationSelected: (int index){
+          switch(index){
+            case 0:
+            Navigator.pushNamed(context, '/home');
+            case 1:
+            Navigator.pushNamed(context, '/discover');
+          }
+        },
       ),
       body: RefreshIndicator(
         onRefresh: _refreshVideos,
@@ -127,7 +135,6 @@ class _HomescreenState extends State<Homescreen> {
                     child: Row(
                       children: [
                         _buildFloatingButton('Home', Icons.home_rounded, '/home'),
-                        _buildFloatingButton('Discover', Icons.book, '/discover'),
                         _buildFloatingButton('Trending', Icons.trending_up_rounded,'/trending'),
                         _buildFloatingButton('Recent', Icons.add_circle_rounded,''),
                         _buildFloatingButton('Local', Icons.location_pin,''),
