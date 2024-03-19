@@ -96,44 +96,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: "Home"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.explore),
-            icon: Icon(Icons.explore_outlined),
-            label: "Discover",
-            enabled: true,
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.search_rounded),
-            icon: Icon(Icons.search_outlined),
-            label: "Search"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.notifications),
-            icon: Icon(Icons.notifications_outlined),
-            label: "Notifications"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.folder),
-            icon: Icon(Icons.folder_outlined),
-            label: "Library"
-          ),
-        ],
-        onDestinationSelected: (int index){
-          switch(index){
-            case 0:
-            Navigator.pushNamed(context, '/home');
-            case 1:
-            Navigator.pushNamed(context, '/discover');
-          }
-        },
-      ),
       appBar: AppBar(
         title: const Text('Discover'),
       ),

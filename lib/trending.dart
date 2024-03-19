@@ -50,35 +50,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: "Home"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.explore),
-            icon: Icon(Icons.explore_outlined),
-            label: "Discover"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.search_rounded),
-            icon: Icon(Icons.search_outlined),
-            label: "Search"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.notifications),
-            icon: Icon(Icons.notifications_outlined),
-            label: "Notifications"
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.folder),
-            icon: Icon(Icons.folder_outlined),
-            label: "Library"
-          ),
-        ]
-      ),
+      
       appBar: AppBar(
         title: Text('Trending'),
       ),
