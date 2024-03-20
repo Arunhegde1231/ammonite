@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -6,6 +7,7 @@ class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen() : super();
 
   @override
+  // ignore: library_private_types_in_public_api
   _DiscoverScreenState createState() => _DiscoverScreenState();
 }
 
@@ -36,14 +38,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         });
       } else {
         // Handle error
-        print('Failed to fetch categories: ${response.statusCode}');
+        if (kDebugMode) {
+          print('Failed to fetch categories: ${response.statusCode}');
+        }
         setState(() {
           loading = false;
         });
       }
     } catch (error) {
       // Handle error
-      print('Error fetching categories: $error');
+      if (kDebugMode) {
+        print('Error fetching categories: $error');
+      }
       setState(() {
         loading = false;
       });
@@ -127,7 +133,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             label: Text(category),
             icon: Icon(iconData),
             elevation: 5,
-            backgroundColor: Color.fromARGB(255, 229, 209, 236),
+            backgroundColor: const Color.fromARGB(255, 229, 209, 236),
             foregroundColor: Colors.black,
           ),
         ),

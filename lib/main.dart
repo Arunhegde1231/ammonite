@@ -2,7 +2,7 @@ import 'package:ammonite/library.dart';
 import 'package:ammonite/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:ammonite/discover.dart';
-import 'package:ammonite/home.dart';
+import 'package:ammonite/home.dart';  
 import 'package:ammonite/search.dart';
 
 void main() {
@@ -108,6 +108,7 @@ class _MyAppState extends State<MyApp> {
           selectedIndex: _selectedIndex,
         ),
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
