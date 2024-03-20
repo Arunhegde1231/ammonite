@@ -38,6 +38,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         appBar: AppBar(title: const Text('Notifications')),
         
       ),
+       debugShowCheckedModeBanner: false,
     );
   }
 }

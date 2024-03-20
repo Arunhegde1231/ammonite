@@ -38,6 +38,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         appBar: AppBar(title: const Text('Library')),
         
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
