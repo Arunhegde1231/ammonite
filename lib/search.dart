@@ -113,7 +113,7 @@ class SearchScreen extends StatefulWidget {
                         child: Text(
                           'Videos',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -189,7 +189,7 @@ class SearchScreen extends StatefulWidget {
                         child: Text(
                           'Channels',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
