@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -113,12 +114,29 @@ class _HomescreenState extends State<Homescreen> {
                                     return Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Image.network(
+                                        GestureDetector(
+                                        onTap: () {
+                                          final videoUrl = video['url'];
+                                          final videoId= video['id'];
+                                          if (videoUrl is String) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => VideoPlayerPage(videoUrl: videoUrl, videoId: videoId),
+                                              ),
+                                            );
+                                          } else {
+                                            // Handle case where video URL is not a string
+                                            // This could be showing an error message or performing a fallback action
+                                          }
+                                        },
+                                        child: Image.network(
                                           thumbnailURL,
                                           width: double.maxFinite,
                                           height: 240,
                                           fit: BoxFit.fill,
                                         ),
+                                      ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 10, left: 6),
                                           child: Row(
