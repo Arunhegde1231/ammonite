@@ -9,7 +9,7 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+ class _SearchScreenState extends State<SearchScreen> {
   late TextEditingController _searchController;
   List<dynamic> videos = [];
   bool loading = false;
@@ -53,10 +53,10 @@ class _SearchScreenState extends State<SearchScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            floating: true, 
+            floating: true,
             snap: true,
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(30),
+              preferredSize: const Size.fromHeight(30),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -103,9 +103,21 @@ class _SearchScreenState extends State<SearchScreen> {
                 final likes = video['likes'] ?? 0;
                 final dislikes = video['dislikes'] ?? 0;
                 final views = video['views'] ?? 0;
+                //final channelSearchdData= 'https://tilvids.com${video[]}';
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (index == 0)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        child: Text(
+                          'Videos',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     if (thumbnailURL.isNotEmpty)
                       Image.network(
                         thumbnailURL,
@@ -171,6 +183,24 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (index == videos.length - 1) 
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        child: Text(
+                          'Channels',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    const Padding(padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+
+                      ],
+                    ),
+                    )
                   ],
                 );
               },
@@ -178,7 +208,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ],
-      )
+      ),
     );
   }
 }
