@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -53,11 +52,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       }
     }
   }
-    Future<void> fetchVideoComments() async {
+  /*Future<void> fetchVideoComments() async {
     try {
       final response = await http.get(Uri.parse('https://tilvids.com/api/v1/videos/${widget.videoId}/comment-threads'));
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        final responseData1 = json.decode(response.body);
         setState(() {
 
         });
@@ -72,7 +71,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       }
     }
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
