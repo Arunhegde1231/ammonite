@@ -53,7 +53,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ],
             onSelected: (String value) {
                 if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const settingsScreen() ),),);
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
                 }
             },
           ),

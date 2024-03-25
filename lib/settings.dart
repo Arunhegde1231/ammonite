@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:system_theme/system_theme.dart';
 
-class settingsScreen extends StatefulWidget{
-  const settingsScreen({Key? key});
+class SettingsScreen extends StatefulWidget{
+  const SettingsScreen({Key? key});
   
   @override
-  State<settingsScreen> createState()=> _settingsScreenState();
+  State<SettingsScreen> createState()=> _SettingsScreenState();
 }
 
-class _settingsScreenState extends State<settingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final accentcolor=SystemTheme.accentColor.accent;

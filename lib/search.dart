@@ -118,6 +118,7 @@ class searchScreen extends StatefulWidget {
                           final searchTerm = _searchController.text;
                           if (searchTerm.isNotEmpty) {
                             fetchVideos(searchTerm);
+                            fetchChannels(searchTerm);
                           }
                         },
                       ),
@@ -130,6 +131,7 @@ class searchScreen extends StatefulWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
+                //for video search results
                 final video = videos[index];
                 final thumbnailURL = video['previewPath'] != null ? 'https://tilvids.com${video['previewPath']}' : '';
                 final channelData = video['channel'];
@@ -138,7 +140,15 @@ class searchScreen extends StatefulWidget {
                 final likes = video['likes'] ?? 0;
                 final dislikes = video['dislikes'] ?? 0;
                 final views = video['views'] ?? 0;
-                //final channelSearchdData= 'https://tilvids.com${video[]}';
+                
+                //for channel search results
+                final channel = channels[index];
+                final channelName2 = channel['display-name'] ?? '';
+                final channelHost = channel['host'] ?? '';
+                final channelDesc = channel['description'] ?? '';
+                final followersCount = channel['followersCount'] ?? 0;
+                final followingCount = channel['followingCount'] ?? 0;
+                final avatar = (channel['avatars'] is Map && channel['avatars']['1'] is Map)? 'https://tilvids.com${channel['avatars']['1']['path']}': '';
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -204,9 +214,9 @@ class searchScreen extends StatefulWidget {
                       child: Row(
                         children: [
                           const Icon(Icons.thumb_up_outlined),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Text('$likes'),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           const Icon(Icons.thumb_down_outlined),
                           const SizedBox(width: 6),
                           Text('$dislikes'),
@@ -229,22 +239,70 @@ class searchScreen extends StatefulWidget {
                           ),
                         ),
                       ),
-                    const Padding(padding: EdgeInsets.all(8.0),
+                    Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-
+                        if(avatar.isNotEmpty)
+                          CircleAvatar(
+                            radius:40,
+                            backgroundImage: NetworkImage(avatar),
+                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          channelName2 ?? '',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Followers: $followersCount',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Following: $followingCount',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          channelHost ?? '',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          channelDesc ?? '',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
-                    )
-                  ],
-                );
-              },
-              childCount: videos.length,
-            ),
-          ),
-        ],
+                  )
+                ]
+              );
+            },
+          childCount: videos.length,
+        ),
       ),
-    );
+    ],
+  ),
+);
   }
 }
 

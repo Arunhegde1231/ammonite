@@ -143,7 +143,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             ],
             onSelected: (String value) {
                 if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const settingsScreen() ),),);
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
                 }
             },
           ),
@@ -157,7 +157,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             ],
             onSelected: (String value) {
                 if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const settingsScreen() ),),);
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
                 }
             },
           ),
