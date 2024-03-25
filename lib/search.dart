@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:system_theme/system_theme.dart';
+//import 'package:system_theme/system_theme.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key});
+class searchScreen extends StatefulWidget {
+  const searchScreen({Key? key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<searchScreen> createState() => _SearchScreenState();
 }
 
- class _SearchScreenState extends State<SearchScreen> {
+ class _SearchScreenState extends State<searchScreen> {
   late TextEditingController _searchController;
   List<dynamic> videos = [];
+  List<dynamic> channels = [];
   bool loading = false;
   String errorMessage = '';
   @override
@@ -49,13 +50,40 @@ class SearchScreen extends StatefulWidget {
     }
   }
 
+  Future<void> fetchChannels(String searchTerm) async {
+    setState(() {
+      loading=true;
+    });
+    try{
+      final response2=await http.get(Uri.parse('https://tilvids.com/api/v1/search/video-channels?search=$searchTerm'));
+      if(response2.statusCode==200){
+        final responseData2=json.decode(response2.body);
+        final List<dynamic> channelList=responseData2['data'];
+        setState(() {
+          channels=channelList;
+          loading=false;
+        });
+        setState(() {
+          channels=channelList;
+          loading=false;
+        });
+      } 
+    }
+    catch(error){
+      setState(() {
+        errorMessage='Error fetching channels : $error';
+        loading=false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int a=accentcolor.alpha;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;
+    //final accentcolor=SystemTheme.accentColor.accent;
+    //int a=accentcolor.alpha;
+    //int r=accentcolor.red;
+    //int g=accentcolor.green;
+    //int b=accentcolor.blue;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
