@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:system_theme/system_theme.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key});
 
@@ -49,6 +51,11 @@ class SearchScreen extends StatefulWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accentcolor=SystemTheme.accentColor.accent;
+    int a=accentcolor.alpha;
+    int r=accentcolor.red;
+    int g=accentcolor.green;
+    int b=accentcolor.blue;
     return Scaffold(
       body: CustomScrollView(
         slivers: [

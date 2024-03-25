@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:ammonite/discover.dart';
 import 'package:ammonite/home.dart';  
 import 'package:ammonite/search.dart';
+import 'package:system_theme/system_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemTheme.accentColor.load(); 
   runApp(MyApp());
 }
 
@@ -53,11 +56,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final accentcolor=SystemTheme.accentColor.accent;
+    int a=accentcolor.alpha;
+    int r=accentcolor.red;
+    int g=accentcolor.green;
+    int b=accentcolor.blue;   
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 209, 116, 225),
+          seedColor:  Color.fromARGB(255, r, g, b),
           brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
@@ -69,7 +77,7 @@ class _MyAppState extends State<MyApp> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 125, 66, 227),
+          seedColor:  Color.fromARGB(255, r, g, b),
           brightness: Brightness.dark,
         ),
       ),

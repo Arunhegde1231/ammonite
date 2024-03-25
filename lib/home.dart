@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:ammonite/settings.dart';
 import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:system_theme/system_theme.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({Key? key});
@@ -77,8 +80,53 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) {   
+    final accentcolor=SystemTheme.accentColor.accent;
+    int a=accentcolor.alpha;
+    int r=accentcolor.red;
+    int g=accentcolor.green;
+    int b=accentcolor.blue;               
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromARGB(255, r, g, b),
+          brightness: Brightness.light,
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontSize: 72,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor:  Color.fromARGB(255, r, g,b),
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: ThemeMode.system,
+      home: Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.settings_outlined),
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: 'account',
+                child: Text('Account'),
+              ),
+            ],
+            onSelected: (String value) {
+                if (value=='account'){
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const settingsScreen() ),),);
+                }
+            },
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: _refreshVideos,
         child: Stack(
@@ -86,11 +134,6 @@ class _HomescreenState extends State<Homescreen> {
             CustomScrollView(
               controller: _scrollController,
               slivers: <Widget>[
-                const SliverAppBar(
-                  title: Text('Home'),
-                  floating: true,
-                  snap: true,
-                ),
                 loading
                     ? const SliverFillRemaining(
                         child: Center(child: CircularProgressIndicator()),
@@ -115,28 +158,28 @@ class _HomescreenState extends State<Homescreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         GestureDetector(
-                                        onTap: () {
-                                          final videoUrl = video['url'];
-                                          final videoId= video['id'];
-                                          if (videoUrl is String) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => VideoPlayerPage(videoUrl: videoUrl, videoId: videoId),
-                                              ),
-                                            );
-                                          } else {
-                                            // Handle case where video URL is not a string
-                                            // This could be showing an error message or performing a fallback action
-                                          }
-                                        },
-                                        child: Image.network(
-                                          thumbnailURL,
-                                          width: double.maxFinite,
-                                          height: 240,
-                                          fit: BoxFit.fill,
+                                          onTap: () {
+                                            final videoUrl = video['url'];
+                                            final videoId= video['id'];
+                                            if (videoUrl is String) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => VideoPlayerPage(videoUrl: videoUrl, videoId: videoId),
+                                                ),
+                                              );
+                                            } else {
+                                              // Handle case where video URL is not a string
+                                              // This could be showing an error message or performing a fallback action
+                                            }
+                                          },
+                                          child: Image.network(
+                                            thumbnailURL,
+                                            width: double.maxFinite,
+                                            height: 240,
+                                            fit: BoxFit.fill,
+                                          ),
                                         ),
-                                      ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 10, left: 6),
                                           child: Row(
@@ -209,7 +252,7 @@ class _HomescreenState extends State<Homescreen> {
               child: Visibility(
                 visible: !_isVisible,
                 child: FloatingActionButton(
-                  backgroundColor: const Color.fromARGB(255, 229, 209, 236),
+                  backgroundColor:  Color.fromARGB(255, r, g, b),
                   onPressed: () {
                     _scrollController.animateTo(
                       0.0,
@@ -217,13 +260,14 @@ class _HomescreenState extends State<Homescreen> {
                       curve: Curves.easeOut,
                     );
                   },
-                  child: const Icon(Icons.keyboard_arrow_up, color: Color.fromARGB(255, 91, 28, 114),),
+                  child: const Icon(Icons.keyboard_arrow_up, color: Color.fromARGB(255, 0, 0, 0),),
                 ),
               ),
             ),
           ],
         ),
       ),
+    ),
     );
   }
 }

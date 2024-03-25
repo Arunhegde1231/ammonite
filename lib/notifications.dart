@@ -1,4 +1,6 @@
+import 'package:ammonite/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:system_theme/system_theme.dart';
 
 void main() => runApp(const NotificationScreen());
 
@@ -12,12 +14,16 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
-    
+    final accentcolor=SystemTheme.accentColor.accent;
+    int a=accentcolor.alpha;
+    int r=accentcolor.red;
+    int g=accentcolor.green;
+    int b=accentcolor.blue;   
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 209, 116, 225),
+          seedColor:  Color.fromARGB(255, r, g, b),
           brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
@@ -29,14 +35,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 125, 66, 227),
+          seedColor:  Color.fromARGB(255, r, g, b),
           brightness: Brightness.dark,
         ),
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        appBar: AppBar(title: const Text('Notifications')),
-        
+        appBar: AppBar(
+          title: const Text('Notifications'),
+          actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.settings_outlined),
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: 'account',
+                child: Text('Account'),
+              ),
+            ],
+            onSelected: (String value) {
+                if (value=='account'){
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const settingsScreen() ),),);
+                }
+            },
+          ),
+        ],
+        ),
       ),
        debugShowCheckedModeBanner: false,
     );
