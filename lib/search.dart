@@ -134,6 +134,7 @@ Widget build(BuildContext context) {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis
                   ),
                 ),
               ),
@@ -144,9 +145,7 @@ Widget build(BuildContext context) {
                 itemCount: channels.length,
                 itemBuilder: (BuildContext context, int index) {
                   final channel = channels[index];
-                  final avatar = (channel['avatar'] is Map && channel['avatar'] is Map)
-                    ? 'https://tilvids.com${channel['avatar']}'
-                    : '';
+                  final avatar = 'https://tilvids.com${channel['avatar']}';
                   final channelname=channel['displayName'];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
