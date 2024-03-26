@@ -2,7 +2,6 @@ import 'package:ammonite/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
 
-void main() => runApp(const NotificationScreen());
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});

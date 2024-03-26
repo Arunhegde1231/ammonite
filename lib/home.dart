@@ -84,6 +84,7 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     final accentcolor = SystemTheme.accentColor.accent;
     int r = accentcolor.red;
     int g = accentcolor.green;
