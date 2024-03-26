@@ -14,15 +14,15 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;   
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor:  Color.fromARGB(255, r, g, b),
+          seedColor: Color.fromARGB(255, r, g, b),
           brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
@@ -34,7 +34,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor:  Color.fromARGB(255, r, g, b),
+          seedColor: Color.fromARGB(255, r, g, b),
           brightness: Brightness.dark,
         ),
       ),
@@ -43,24 +43,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
         appBar: AppBar(
           title: const Text('Notifications'),
           actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.settings_outlined),
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
-                value: 'account',
-                child: Text('Account'),
-              ),
-            ],
-            onSelected: (String value) {
-                if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
+            PopupMenuButton(
+              icon: const Icon(Icons.settings_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
                 }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
         ),
       ),
-       debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

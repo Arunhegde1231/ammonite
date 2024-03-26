@@ -11,7 +11,7 @@ class searchScreen extends StatefulWidget {
   State<searchScreen> createState() => _SearchScreenState();
 }
 
- class _SearchScreenState extends State<searchScreen> {
+class _SearchScreenState extends State<searchScreen> {
   late TextEditingController _searchController;
   List<dynamic> videos = [];
   List<dynamic> channels = [];
@@ -28,7 +28,8 @@ class searchScreen extends StatefulWidget {
       loading = true;
     });
     try {
-      final response = await http.get(Uri.parse('https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
+      final response = await http.get(Uri.parse(
+          'https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
@@ -52,36 +53,35 @@ class searchScreen extends StatefulWidget {
 
   Future<void> fetchChannels(String searchTerm) async {
     setState(() {
-      loading=true;
+      loading = true;
     });
-    try{
-      final response2=await http.get(Uri.parse('https://tilvids.com/api/v1/search/video-channels?search=$searchTerm'));
-      if(response2.statusCode==200){
-        final responseData2=json.decode(response2.body);
-        final List<dynamic> channelList=responseData2['data'];
+    try {
+      final response2 = await http.get(Uri.parse(
+          'https://tilvids.com/api/v1/search/video-channels?search=$searchTerm'));
+      if (response2.statusCode == 200) {
+        final responseData2 = json.decode(response2.body);
+        final List<dynamic> channelList = responseData2['data'];
         setState(() {
-          channels=channelList;
-          loading=false;
+          channels = channelList;
+          loading = false;
         });
         setState(() {
-          channels=channelList;
-          loading=false;
+          channels = channelList;
+          loading = false;
         });
-      } 
-    }
-    catch(error){
+      }
+    } catch (error) {
       setState(() {
-        errorMessage='Error fetching channels : $error';
-        loading=false;
+        errorMessage = 'Error fetching channels : $error';
+        loading = false;
       });
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: CustomScrollView(
-      slivers: [
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(slivers: [
         SliverAppBar(
           floating: true,
           snap: true,
@@ -132,31 +132,32 @@ Widget build(BuildContext context) {
                 child: Text(
                   'Channels',
                   style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis
-                  ),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis),
                 ),
               ),
               SizedBox(
-                height: 150, 
+                height: 150,
                 child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: channels.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final channel = channels[index];
-                  final avatar = 'https://tilvids.com${channel['avatar']}';
-                  final channelname=channel['displayName'];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child : Column(
-                      children: [
-                      CircleAvatar(radius:50, backgroundImage: NetworkImage(avatar),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        channelname,
-                        style: const TextStyle(fontSize: 14),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: channels.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final channel = channels[index];
+                    final avatar = 'https://tilvids.com${channel['avatar']}';
+                    final channelname = channel['displayName'];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(avatar),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            channelname,
+                            style: const TextStyle(fontSize: 14),
                           ),
                         ],
                       ),
@@ -170,21 +171,28 @@ Widget build(BuildContext context) {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-                final video = videos[index];
-                final thumbnailURL = video['previewPath'] != null ? 'https://tilvids.com${video['previewPath']}' : '';
-                final channelData = video['channel'];
-                final channelName = channelData != null ? channelData['displayName'] : '';
-                final channelAvatar = channelData != null && channelData['avatar'] != null ? 'https://tilvids.com${channelData['avatar']['path']}' : '';
-                final likes = video['likes'] ?? 0;
-                final dislikes = video['dislikes'] ?? 0;
-                final views = video['views'] ?? 0;
-                
-                return Column(
+              final video = videos[index];
+              final thumbnailURL = video['previewPath'] != null
+                  ? 'https://tilvids.com${video['previewPath']}'
+                  : '';
+              final channelData = video['channel'];
+              final channelName =
+                  channelData != null ? channelData['displayName'] : '';
+              final channelAvatar =
+                  channelData != null && channelData['avatar'] != null
+                      ? 'https://tilvids.com${channelData['avatar']['path']}'
+                      : '';
+              final likes = video['likes'] ?? 0;
+              final dislikes = video['dislikes'] ?? 0;
+              final views = video['views'] ?? 0;
+
+              return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (index == 0)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                         child: Text(
                           'Videos',
                           style: TextStyle(
@@ -258,14 +266,12 @@ Widget build(BuildContext context) {
                       ),
                     ),
                     const SizedBox(height: 16),
-                ]
-              );
+                  ]);
             },
-          childCount: videos.length,
+            childCount: videos.length,
+          ),
         ),
-      ),
-    ]
-  ),
-  );
+      ]),
+    );
   }
- }
+}

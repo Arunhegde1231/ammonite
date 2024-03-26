@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:system_theme/system_theme.dart';
 
-class SettingsScreen extends StatefulWidget{
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key});
-  
+
   @override
-  State<SettingsScreen> createState()=> _SettingsScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return MaterialApp(
-    theme: ThemeData(
+      theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color.fromARGB(255, r, g, b),
@@ -37,11 +37,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       themeMode: ThemeMode.system,
-    home: Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Settings'),
+        ),
       ),
-    ),
     );
   }
 }

@@ -32,7 +32,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> fetchVideoData() async {
     try {
-      final response = await http.get(Uri.parse('https://tilvids.com/api/v1/videos/${widget.videoId}'));
+      final response = await http.get(
+          Uri.parse('https://tilvids.com/api/v1/videos/${widget.videoId}'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         setState(() {
@@ -52,6 +53,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       }
     }
   }
+
   /*Future<void> fetchVideoComments() async {
     try {
       final response = await http.get(Uri.parse('https://tilvids.com/api/v1/videos/${widget.videoId}/comment-threads'));
@@ -75,7 +77,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

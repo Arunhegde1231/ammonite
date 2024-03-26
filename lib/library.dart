@@ -12,18 +12,17 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-
   @override
   Widget build(BuildContext context) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;   
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor:  Color.fromARGB(255, r, g, b),
+          seedColor: Color.fromARGB(255, r, g, b),
           brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
@@ -35,14 +34,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor:  Color.fromARGB(255, r, g, b),
+          seedColor: Color.fromARGB(255, r, g, b),
           brightness: Brightness.dark,
         ),
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        appBar: AppBar(
-          actions: [
+        appBar: AppBar(actions: [
           PopupMenuButton(
             icon: const Icon(Icons.settings_outlined),
             itemBuilder: (BuildContext context) => [
@@ -52,14 +50,17 @@ class _LibraryScreenState extends State<LibraryScreen> {
               ),
             ],
             onSelected: (String value) {
-                if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
-                }
+              if (value == 'account') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: ((context) => const SettingsScreen()),
+                  ),
+                );
+              }
             },
           ),
-        ],
-          title: const Text('Library')),
-        
+        ], title: const Text('Library')),
       ),
       debugShowCheckedModeBanner: false,
     );

@@ -29,12 +29,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     });
 
     try {
-      final response = await http.get(Uri.parse('https://tilvids.com/api/v1/videos/categories'));
+      final response = await http
+          .get(Uri.parse('https://tilvids.com/api/v1/videos/categories'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         setState(() {
           categoriesWithIcons = responseData.entries
-              .map((entry) => {'name': entry.value, 'icon': _getIconForCategory(entry.key)})
+              .map((entry) =>
+                  {'name': entry.value, 'icon': _getIconForCategory(entry.key)})
               .toList();
           loading = false;
         });
@@ -59,7 +61,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   IconData _getIconForCategory(String categoryId) {
-    switch(categoryId){
+    switch (categoryId) {
       case '1':
         return Icons.music_note_outlined;
       case '2':
@@ -103,12 +105,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return MaterialApp(
-       theme: ThemeData(
+      theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color.fromARGB(255, r, g, b),
@@ -123,67 +125,79 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor:  Color.fromARGB(255, r, g, b),
+          seedColor: Color.fromARGB(255, r, g, b),
           brightness: Brightness.dark,
         ),
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        title: const Text('Discover'),
-        actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.settings_outlined),
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
-                value: 'account',
-                child: Text('Account'),
-              ),
-            ],
-            onSelected: (String value) {
-                if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
-                }
-            },
-          ),
-          PopupMenuButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
-                value: 'account',
-                child: Text('Account'),
-              ),
-            ],
-            onSelected: (String value) {
-                if (value=='account'){
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsScreen() ),),);
-                }
-            },
-          ),
-        ],
-      ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : categoriesWithIcons.isEmpty
-              ? const Center(child: Text('No categories found'))
-              : GridView.count(
-                  crossAxisCount: 2,
-                  children: List.generate(
-                    categoriesWithIcons.length,
-                    (index) => _buildCategoryButton(categoriesWithIcons[index]['name'], categoriesWithIcons[index]['icon']),
-                  ),
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          title: const Text('Discover'),
+          actions: [
+            PopupMenuButton(
+              icon: const Icon(Icons.settings_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
                 ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
+                }
+              },
+            ),
+            PopupMenuButton(
+              icon: const Icon(Icons.account_circle_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        body: loading
+            ? const Center(child: CircularProgressIndicator())
+            : categoriesWithIcons.isEmpty
+                ? const Center(child: Text('No categories found'))
+                : GridView.count(
+                    crossAxisCount: 2,
+                    children: List.generate(
+                      categoriesWithIcons.length,
+                      (index) => _buildCategoryButton(
+                          categoriesWithIcons[index]['name'],
+                          categoriesWithIcons[index]['icon']),
+                    ),
+                  ),
       ),
       debugShowCheckedModeBanner: false,
     );
   }
 
   Widget _buildCategoryButton(String category, IconData iconData) {
-    final accentcolor=SystemTheme.accentColor.accent;
-    int r=accentcolor.red;
-    int g=accentcolor.green;
-    int b=accentcolor.blue;
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Container(
@@ -197,7 +211,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             label: Text(category),
             icon: Icon(iconData),
             elevation: 5,
-            backgroundColor:  Color.fromARGB(255, r, g, b),
+            backgroundColor: Color.fromARGB(255, r, g, b),
             foregroundColor: Colors.black,
           ),
         ),
