@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:ammonite/home.dart';
+import 'package:ammonite/categoryscreen.dart';
 import 'package:ammonite/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -199,54 +199,32 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     int r = accentcolor.red;
     int g = accentcolor.green;
     int b = accentcolor.blue;
-
-    if (category.toLowerCase() == 'music') {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: SizedBox(
-            height: 36,
-            child: FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Homescreen(),
-                  ),
-                );
-              },
-              label: Text(category),
-              icon: Icon(iconData),
-              elevation: 5,
-              backgroundColor: Color.fromARGB(255, r, g, b),
-              foregroundColor: Colors.black,
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: SizedBox(
+          height: 36,
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CategoryVideosScreen(category: category),
+                ),
+              );
+            },
+            label: Text(category),
+            icon: Icon(iconData),
+            elevation: 5,
+            backgroundColor: Color.fromARGB(255, r, g, b),
+            foregroundColor: Colors.black,
           ),
         ),
-      );
-    } else {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: SizedBox(
-            height: 36,
-            child: FloatingActionButton.extended(
-              onPressed: () {},
-              label: Text(category),
-              icon: Icon(iconData),
-              elevation: 5,
-              backgroundColor: Color.fromARGB(255, r, g, b),
-              foregroundColor: Colors.black,
-            ),
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 }
