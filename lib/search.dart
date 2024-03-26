@@ -1,8 +1,7 @@
+import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-//import 'package:system_theme/system_theme.dart';
 
 class searchScreen extends StatefulWidget {
   const searchScreen({Key? key});
@@ -17,6 +16,8 @@ class _SearchScreenState extends State<searchScreen> {
   List<dynamic> channels = [];
   bool loading = false;
   String errorMessage = '';
+  bool showChannels = false; // Track if channels should be shown
+
   @override
   void initState() {
     super.initState();
@@ -64,10 +65,7 @@ class _SearchScreenState extends State<searchScreen> {
         setState(() {
           channels = channelList;
           loading = false;
-        });
-        setState(() {
-          channels = channelList;
-          loading = false;
+          showChannels = true; // Show channels
         });
       }
     } catch (error) {
@@ -93,6 +91,7 @@ class _SearchScreenState extends State<searchScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100.0),
                   color: const Color.fromARGB(255, 255, 255, 255),
+                  border: Border.all(color: Colors.black),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -123,55 +122,74 @@ class _SearchScreenState extends State<searchScreen> {
             ),
           ),
         ),
-        SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                child: Text(
-                  'Channels',
-                  style: TextStyle(
+        if (showChannels)
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  child: Text(
+                    'Channels',
+                    style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: channels.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final channel = channels[index];
-                    final avatar = 'https://tilvids.com${channel['avatar']}';
-                    final channelname = channel['displayName'];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(avatar),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            channelname,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                SizedBox(
+                  height: 170,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: channels.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final channel = channels[index];
+                      final ownerAccount = channel['ownerAccount'];
+                      final List<dynamic> avatars = ownerAccount['avatars'];
+                      final avatarPath =
+                          avatars.isNotEmpty ? avatars[1]['path'] : '';
+                      final avatar = 'https://tilvids.com$avatarPath';
+                      final channelname = ownerAccount['displayName'];
+
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(avatar),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              channelname,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              final video = videos[index];
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Text(
+                    'Videos',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }
+              final video = videos[index - 1];
               final thumbnailURL = video['previewPath'] != null
                   ? 'https://tilvids.com${video['previewPath']}'
                   : '';
@@ -182,93 +200,94 @@ class _SearchScreenState extends State<searchScreen> {
                   channelData != null && channelData['avatar'] != null
                       ? 'https://tilvids.com${channelData['avatar']['path']}'
                       : '';
-              final likes = video['likes'] ?? 0;
-              final dislikes = video['dislikes'] ?? 0;
-              final views = video['views'] ?? 0;
-
               return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (index == 0)
-                      const Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                        child: Text(
-                          'Videos',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      final videoUrl = video['url'];
+                      final videoId = video['id'];
+                      if (videoUrl is String) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPlayerPage(
+                                videoUrl: videoUrl, videoId: videoId),
+                          ),
+                        );
+                      } else {
+                        print(errorMessage);
+                      }
+                    },
+                    child: Image.network(
+                      thumbnailURL,
+                      width: double.maxFinite,
+                      height: 240,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 6),
+                    child: Row(
+                      children: [
+                        if (channelAvatar.isNotEmpty)
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(channelAvatar),
+                          ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                video['name'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'RobotoMono',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                              const SizedBox(height: 2),
+                              if (channelName.isNotEmpty)
+                                Text(
+                                  '$channelName',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                      ),
-                    if (thumbnailURL.isNotEmpty)
-                      Image.network(
-                        thumbnailURL,
-                        width: double.maxFinite,
-                        height: 240,
-                        fit: BoxFit.fill,
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
-                      child: Row(
-                        children: [
-                          if (channelAvatar.isNotEmpty)
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundImage: NetworkImage(channelAvatar),
-                            ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  video['name'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'RobotoMono',
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                ),
-                                const SizedBox(height: 2),
-                                if (channelName.isNotEmpty)
-                                  Text(
-                                    '$channelName',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 53, top: 6),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.thumb_up_outlined),
-                          const SizedBox(width: 8),
-                          Text('$likes'),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.thumb_down_outlined),
-                          const SizedBox(width: 6),
-                          Text('$dislikes'),
-                          const SizedBox(width: 8),
-                          const Text('•'),
-                          const SizedBox(width: 8),
-                          Text('$views Views'),
-                        ],
-                      ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 53, top: 6),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.thumb_up_outlined),
+                        const SizedBox(width: 6),
+                        Text('${video['likes'] ?? 0}'),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.thumb_down_outlined),
+                        const SizedBox(width: 6),
+                        Text('${video['dislikes'] ?? 0}'),
+                        const SizedBox(width: 8),
+                        const Text('•'),
+                        const SizedBox(width: 8),
+                        Text('${video['views'] ?? 0} Views'),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                  ]);
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
             },
-            childCount: videos.length,
+            childCount: videos.length + 1,
           ),
         ),
       ]),

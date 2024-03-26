@@ -4,7 +4,6 @@ import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 
@@ -84,7 +83,6 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     final accentcolor = SystemTheme.accentColor.accent;
     int r = accentcolor.red;
     int g = accentcolor.green;
@@ -186,8 +184,7 @@ class _HomescreenState extends State<Homescreen> {
                                                   ),
                                                 );
                                               } else {
-                                                // Handle case where video URL is not a string
-                                                // This could be showing an error message or performing a fallback action
+                                                print(errorMessage);
                                               }
                                             },
                                             child: Image.network(
