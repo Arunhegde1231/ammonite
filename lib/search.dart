@@ -28,7 +28,7 @@ class searchScreen extends StatefulWidget {
       loading = true;
     });
     try {
-      final response = await http.get(Uri.parse('https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=10'));
+      final response = await http.get(Uri.parse('https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
@@ -77,61 +77,100 @@ class searchScreen extends StatefulWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //final accentcolor=SystemTheme.accentColor.accent;
-    //int a=accentcolor.alpha;
-    //int r=accentcolor.red;
-    //int g=accentcolor.green;
-    //int b=accentcolor.blue;
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            floating: true,
-            snap: true,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(30),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100.0),
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            hintText: 'Search',
-                            border: InputBorder.none,
-                          ),
-                          style: const TextStyle(color: Colors.black),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          floating: true,
+          snap: true,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(30),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search',
+                          border: InputBorder.none,
                         ),
+                        style: const TextStyle(color: Colors.black),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.search, color: Colors.black),
-                        onPressed: () {
-                          final searchTerm = _searchController.text;
-                          if (searchTerm.isNotEmpty) {
-                            fetchVideos(searchTerm);
-                            fetchChannels(searchTerm);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search, color: Colors.black),
+                      onPressed: () {
+                        final searchTerm = _searchController.text;
+                        if (searchTerm.isNotEmpty) {
+                          fetchVideos(searchTerm);
+                          fetchChannels(searchTerm);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                //for video search results
+        ),
+        SliverToBoxAdapter(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Text(
+                  'Channels',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 150, 
+                child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: channels.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final channel = channels[index];
+                  final avatar = (channel['avatar'] is Map && channel['avatar'] is Map)
+                    ? 'https://tilvids.com${channel['avatar']}'
+                    : '';
+                  final channelname=channel['displayName'];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child : Column(
+                      children: [
+                      CircleAvatar(radius:50, backgroundImage: NetworkImage(avatar),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        channelname,
+                        style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
                 final video = videos[index];
                 final thumbnailURL = video['previewPath'] != null ? 'https://tilvids.com${video['previewPath']}' : '';
                 final channelData = video['channel'];
@@ -141,14 +180,6 @@ class searchScreen extends StatefulWidget {
                 final dislikes = video['dislikes'] ?? 0;
                 final views = video['views'] ?? 0;
                 
-                //for channel search results
-                final channel = channels[index];
-                final channelName2 = channel['display-name'] ?? '';
-                final channelHost = channel['host'] ?? '';
-                final channelDesc = channel['description'] ?? '';
-                final followersCount = channel['followersCount'] ?? 0;
-                final followingCount = channel['followingCount'] ?? 0;
-                final avatar = (channel['avatars'] is Map && channel['avatars']['1'] is Map)? 'https://tilvids.com${channel['avatars']['1']['path']}': '';
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -158,7 +189,7 @@ class searchScreen extends StatefulWidget {
                         child: Text(
                           'Videos',
                           style: TextStyle(
-                            fontSize: 40,
+                            fontSize: 30,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -228,81 +259,14 @@ class searchScreen extends StatefulWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    if (index == videos.length - 1) 
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                        child: Text(
-                          'Channels',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        if(avatar.isNotEmpty)
-                          CircleAvatar(
-                            radius:40,
-                            backgroundImage: NetworkImage(avatar),
-                          ),
-                        const SizedBox(height: 8),
-                        Text(
-                          channelName2 ?? '',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Followers: $followersCount',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Following: $followingCount',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          channelHost ?? '',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          channelDesc ?? '',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  )
                 ]
               );
             },
           childCount: videos.length,
         ),
       ),
-    ],
+    ]
   ),
-);
+  );
   }
-}
-
+ }
