@@ -1,7 +1,12 @@
+import 'dart:ui';
+
 import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:system_theme/system_theme.dart';
+
 
 class searchScreen extends StatefulWidget {
   const searchScreen({Key? key});
@@ -16,7 +21,8 @@ class _SearchScreenState extends State<searchScreen> {
   List<dynamic> channels = [];
   bool loading = false;
   String errorMessage = '';
-  bool showChannels = false; // Track if channels should be shown
+  bool showChannels = false; 
+  bool searchdone=false;
 
   @override
   void initState() {
@@ -37,6 +43,7 @@ class _SearchScreenState extends State<searchScreen> {
         setState(() {
           videos = videosList;
           loading = false;
+          searchdone=true;
         });
       } else {
         setState(() {
@@ -65,7 +72,7 @@ class _SearchScreenState extends State<searchScreen> {
         setState(() {
           channels = channelList;
           loading = false;
-          showChannels = true; // Show channels
+          showChannels = true; 
         });
       }
     } catch (error) {
@@ -78,6 +85,10 @@ class _SearchScreenState extends State<searchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return Scaffold(
       body: CustomScrollView(slivers: [
         SliverAppBar(
@@ -174,14 +185,30 @@ class _SearchScreenState extends State<searchScreen> {
               ],
             ),
           ),
+        if(searchdone)
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical:10),
+            child: Text( 
+              'Videos',
+              style:TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              )
+            )
+          ),
+        ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
+             Divider(
+                color: Color.fromARGB(255, r, g, b)
+              );
               if (index == 0) {
                 return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                   child: Text(
-                    'Videos',
+                    '',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -189,7 +216,7 @@ class _SearchScreenState extends State<searchScreen> {
                   ),
                 );
               }
-              final video = videos[index - 1];
+              final video = videos[index ];
               final thumbnailURL = video['previewPath'] != null
                   ? 'https://tilvids.com${video['previewPath']}'
                   : '';
@@ -294,3 +321,92 @@ class _SearchScreenState extends State<searchScreen> {
     );
   }
 }
+
+/*
+class searchScreen extends StatefulWidget {
+  const searchScreen({Key? key});
+
+  @override
+  State<searchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<searchScreen> {
+  late TextEditingController _searchController;
+  List<dynamic> videos = [];
+  List<dynamic> channels = [];
+  bool loading = false;
+  String errorMessage = '';
+  bool showChannels = false; // Track if channels should be shown
+  bool searchPerformed = false; // Track if a search has been performed
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  Future<void> fetchVideos(String searchTerm) async {
+    setState(() {
+      loading = true;
+    });
+    try {
+      final response = await http.get(Uri.parse(
+          'https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> videosList = responseData['data'];
+        setState(() {
+          videos = videosList;
+          loading = false;
+          searchPerformed = true; // Set searchPerformed to true
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load videos: ${response.statusCode}';
+          loading = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Error fetching videos: $error';
+        loading = false;
+      });
+    }
+  }
+
+  // Remaining code...
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(slivers: [
+        // SliverAppBar and other code...
+
+        if (searchPerformed) // Only show Videos heading if searchPerformed is true
+          SliverToBoxAdapter(
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Text(
+                'Videos',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              // Divider and other code...
+            },
+            childCount: videos.length + 1,
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+*/
