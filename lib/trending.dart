@@ -6,6 +6,7 @@ class TrendingScreen extends StatefulWidget {
   const TrendingScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _TrendingScreenState createState() => _TrendingScreenState();
 }
 
@@ -52,12 +53,12 @@ class _TrendingScreenState extends State<TrendingScreen> {
     return Scaffold(
       
       appBar: AppBar(
-        title: Text('Trending'),
+        title: const Text('Trending'),
       ),
       body: loading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : trendingVideos.isEmpty
-              ? Center(child: Text('No trending videos found'))
+              ? const Center(child: Text('No trending videos found'))
               : ListView.builder(
                   itemCount: trendingVideos.length,
                   itemBuilder: (context, index) {
