@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:system_theme/system_theme.dart';
 
-
 class searchScreen extends StatefulWidget {
   const searchScreen({Key? key});
 
@@ -321,92 +320,3 @@ class _SearchScreenState extends State<searchScreen> {
     );
   }
 }
-
-/*
-class searchScreen extends StatefulWidget {
-  const searchScreen({Key? key});
-
-  @override
-  State<searchScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<searchScreen> {
-  late TextEditingController _searchController;
-  List<dynamic> videos = [];
-  List<dynamic> channels = [];
-  bool loading = false;
-  String errorMessage = '';
-  bool showChannels = false; // Track if channels should be shown
-  bool searchPerformed = false; // Track if a search has been performed
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-  }
-
-  Future<void> fetchVideos(String searchTerm) async {
-    setState(() {
-      loading = true;
-    });
-    try {
-      final response = await http.get(Uri.parse(
-          'https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final List<dynamic> videosList = responseData['data'];
-        setState(() {
-          videos = videosList;
-          loading = false;
-          searchPerformed = true; // Set searchPerformed to true
-        });
-      } else {
-        setState(() {
-          errorMessage = 'Failed to load videos: ${response.statusCode}';
-          loading = false;
-        });
-      }
-    } catch (error) {
-      setState(() {
-        errorMessage = 'Error fetching videos: $error';
-        loading = false;
-      });
-    }
-  }
-
-  // Remaining code...
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(slivers: [
-        // SliverAppBar and other code...
-
-        if (searchPerformed) // Only show Videos heading if searchPerformed is true
-          SliverToBoxAdapter(
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Text(
-                'Videos',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              // Divider and other code...
-            },
-            childCount: videos.length + 1,
-          ),
-        ),
-      ]),
-    );
-  }
-}
-
-*/
