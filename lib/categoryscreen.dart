@@ -22,7 +22,7 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
   int currentPage = 1;
   final int videosPerPage = 10;
   final ScrollController _scrollController = ScrollController();
-  bool isFetchingMore = false; // Flag to track if more data is being fetched
+  bool isFetchingMore = false; 
 
   @override
   void initState() {

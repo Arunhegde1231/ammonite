@@ -100,7 +100,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                   )
                 : Container(),
             FloatingActionButton(
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onPressed: () {
                   setState(() {
                     _controller.value.isPlaying

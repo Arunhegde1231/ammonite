@@ -61,6 +61,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 }
               },
             ),
+            PopupMenuButton(
+              icon: const Icon(Icons.account_circle_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),

@@ -5,14 +5,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:system_theme/system_theme.dart';
 
-class searchScreen extends StatefulWidget {
-  const searchScreen({Key? key});
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({Key? key});
 
   @override
-  State<searchScreen> createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<searchScreen> {
+class _SearchScreenState extends State<SearchScreen> {
   late TextEditingController _searchController;
   List<dynamic> videos = [];
   List<dynamic> channels = [];

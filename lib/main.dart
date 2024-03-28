@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   static final List<Widget> _widgetOptions = <Widget>[
     const Homescreen(),
     const DiscoverScreen(),
-    const searchScreen(),
+    const SearchScreen(),
     const NotificationScreen(),
     const LibraryScreen()
   ];

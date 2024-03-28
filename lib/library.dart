@@ -40,29 +40,50 @@ class _LibraryScreenState extends State<LibraryScreen> {
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        appBar: AppBar(actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.settings_outlined),
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
-                value: 'account',
-                child: Text('Account'),
-              ),
-            ],
-            onSelected: (String value) {
-              if (value == 'account') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => const SettingsScreen()),
-                  ),
-                );
-              }
-            },
-          ),
-        ], title: const Text('Library')),
-      ),
-      debugShowCheckedModeBanner: false,
+        appBar: AppBar(
+          actions: [
+            PopupMenuButton(
+              icon: const Icon(Icons.settings_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
+                }
+              },
+            ),
+            PopupMenuButton(
+              icon: const Icon(Icons.account_circle_outlined),
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: 'account',
+                  child: Text('Account'),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'account') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const SettingsScreen()),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+    ),
+    debugShowCheckedModeBanner: false,
     );
   }
 }
