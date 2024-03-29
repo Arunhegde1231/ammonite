@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 
+const List<String> list = <String>['Latest', 'Trending', 'Local Videos'];
+
 class Homescreen extends StatefulWidget {
   const Homescreen({Key? key});
 
@@ -18,6 +20,7 @@ class _HomescreenState extends State<Homescreen> {
   List<dynamic> videos = [];
   bool loading = true;
   String errorMessage = '';
+  String _selectedItem = 'Item1';
 
   final ScrollController _scrollController = ScrollController();
   bool _isVisible = false;
@@ -83,6 +86,7 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    String dropdownvalue = list.first;
     final accentcolor = SystemTheme.accentColor.accent;
     int r = accentcolor.red;
     int g = accentcolor.green;
@@ -110,7 +114,33 @@ class _HomescreenState extends State<Homescreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Home'),
+          titleSpacing: 0,
+          title: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownMenu<String>(
+                    width: 200, 
+                    initialSelection: list.first,
+                    onSelected: (String? newValue) {
+                      setState(() {
+                        dropdownvalue = newValue!;
+                      });
+                    },
+                    dropdownMenuEntries:
+                        list.map<DropdownMenuEntry<String>>((String value) {
+                      return DropdownMenuEntry<String>(
+                          value: value, label: value);
+                    }).toList(),
+                  ),
+                ),
+              )
+            ],
+          ),
           actions: [
             PopupMenuButton(
               icon: const Icon(Icons.settings_outlined),
