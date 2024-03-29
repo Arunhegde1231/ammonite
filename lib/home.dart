@@ -20,7 +20,6 @@ class _HomescreenState extends State<Homescreen> {
   List<dynamic> videos = [];
   bool loading = true;
   String errorMessage = '';
-  String _selectedItem = 'Item1';
 
   final ScrollController _scrollController = ScrollController();
   bool _isVisible = false;
