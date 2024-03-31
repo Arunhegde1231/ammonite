@@ -133,7 +133,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          forceMaterialTransparency: true,
           title: const Text('Discover'),
           actions: [
             PopupMenuButton(

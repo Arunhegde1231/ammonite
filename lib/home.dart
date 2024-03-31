@@ -36,12 +36,10 @@ class _HomescreenState extends State<Homescreen> {
 
     if (_scrollController.position.userScrollDirection ==
         ScrollDirection.reverse) {
-      // Scrolling up
       setState(() {
         _isVisible = !isScrolledToTop;
       });
     } else {
-      // Scrolling down
       setState(() {
         _isVisible = false;
       });
@@ -85,7 +83,6 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    String dropdownvalue = list.first;
     final accentcolor = SystemTheme.accentColor.accent;
     int r = accentcolor.red;
     int g = accentcolor.green;
@@ -113,33 +110,7 @@ class _HomescreenState extends State<Homescreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          titleSpacing: 0,
-          title: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DropdownMenu<String>(
-                    width: 200,
-                    initialSelection: list.first,
-                    onSelected: (String? newValue) {
-                      setState(() {
-                        dropdownvalue = newValue!;
-                      });
-                    },
-                    dropdownMenuEntries:
-                        list.map<DropdownMenuEntry<String>>((String value) {
-                      return DropdownMenuEntry<String>(
-                          value: value, label: value);
-                    }).toList(),
-                  ),
-                ),
-              )
-            ],
-          ),
+          title: const Text('Discover'),
           actions: [
             PopupMenuButton(
               icon: const Icon(Icons.settings_outlined),
@@ -203,7 +174,7 @@ class _HomescreenState extends State<Homescreen> {
                               : SliverList(
                                   delegate: SliverChildBuilderDelegate(
                                     (BuildContext context, int index) {
-                                     final video = videos[index];
+                                      final video = videos[index];
                                       final thumbnailURL = video[
                                                   'previewPath'] !=
                                               null
