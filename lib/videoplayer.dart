@@ -1,10 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter/material.dart';
+import 'package:system_theme/system_theme.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   final int videoId;
@@ -27,6 +26,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   late VideoPlayerController _controller;
   String name = '';
   bool _isInitialized = false;
+  String channelName = '';
+  String channelAvatar = '';
 
   @override
   void initState() {
@@ -46,6 +47,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
           name = responseData['name'];
+          channelName = responseData['channel']['name'];
+          if (responseData['channel']['avatars'].isNotEmpty) {
+            channelAvatar = responseData['channel']['avatars'][1]['path'];
+          }
         });
 
         final playlistUrl =
@@ -68,14 +73,19 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return Scaffold(
       appBar: AppBar(
         title: Text(
           name,
           style: const TextStyle(
-              fontSize: 15.0,
-              fontStyle: FontStyle.normal,
-              fontWeight: FontWeight.bold),
+            fontSize: 15.0,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -90,7 +100,17 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
+                      IconButton.outlined(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                            (states) => Color.fromARGB(255, r, g, b),
+                          ),
+                          iconColor: MaterialStateColor.resolveWith(
+                            (states) => const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                        splashRadius: 30,
+                        enableFeedback: true,
                         icon: Icon(_controller.value.isPlaying
                             ? Icons.pause
                             : Icons.play_arrow),
@@ -102,7 +122,17 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           });
                         },
                       ),
-                      IconButton(
+                      IconButton.outlined(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                            (states) => Color.fromARGB(255, r, g, b),
+                          ),
+                          iconColor: MaterialStateColor.resolveWith(
+                            (states) => const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                        splashRadius: 30,
+                        enableFeedback: true,
                         icon: const Icon(Icons.stop),
                         onPressed: () {
                           setState(() {
@@ -113,16 +143,44 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.thumb_up_outlined),
+                      const SizedBox(width: 6),
+                      Text('$likes'),
+                      const SizedBox(width: 20),
+                      const Icon(Icons.thumb_down_outlined),
+                      const SizedBox(width: 6),
+                      Text('$dislikes'),
+                      const SizedBox(width: 20),
+                      const Text('•'),
+                      const SizedBox(width: 8),
+                      Text('$views Views'),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ExpansionTile(
+                    title: const Text(
+                      'Description',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          description,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               )
             : const Center(child: CircularProgressIndicator()),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
   }
 }
