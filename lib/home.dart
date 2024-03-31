@@ -123,7 +123,7 @@ class _HomescreenState extends State<Homescreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownMenu<String>(
-                    width: 200, 
+                    width: 200,
                     initialSelection: list.first,
                     onSelected: (String? newValue) {
                       setState(() {
@@ -203,16 +203,27 @@ class _HomescreenState extends State<Homescreen> {
                               : SliverList(
                                   delegate: SliverChildBuilderDelegate(
                                     (BuildContext context, int index) {
-                                      final video = videos[index];
-                                      final thumbnailURL =
-                                          'https://tilvids.com${video['previewPath']}';
+                                     final video = videos[index];
+                                      final thumbnailURL = video[
+                                                  'previewPath'] !=
+                                              null
+                                          ? 'https://tilvids.com${video['previewPath']}'
+                                          : ''; // Provide a default value if previewPath is null
+
                                       final channelData = video['channel'];
-                                      final channelName = channelData != null
+                                      final channelName = channelData != null &&
+                                              channelData['displayName'] != null
                                           ? channelData['displayName']
-                                          : '';
-                                      final channelAvatar = channelData != null
+                                          : ''; // Provide a default value if channelData or displayName is null
+
+                                      final channelAvatar = channelData !=
+                                                  null &&
+                                              channelData['avatar'] != null &&
+                                              channelData['avatar']['path'] !=
+                                                  null
                                           ? 'https://tilvids.com${channelData['avatar']['path']}'
-                                          : '';
+                                          : ''; // Provide a default value if channelData, avatar, or path is null
+
                                       return Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
