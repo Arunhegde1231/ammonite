@@ -80,7 +80,7 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
                         if (index < videos.length) {
                           final video = videos[index];
                           final channelName =
-                              'https://tilvids.com${video['channel']['displayName']}';
+                              '${video['channel']['displayName']}';
                           final thumbnailURL =
                               'https://tilvids.com${video['previewPath']}';
                           final channelAvatar = video['account']['avatar'] !=
