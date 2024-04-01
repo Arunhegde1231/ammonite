@@ -81,16 +81,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     int g = accentcolor.green;
     int b = accentcolor.blue;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          name,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: _isInitialized
             ? Column(
@@ -102,52 +93,16 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           child: VideoPlayer(_controller),
                         )
                       : Container(),
-                      VideoProgressIndicator(_controller, allowScrubbing: true, padding: const EdgeInsets.all(10.0), colors: VideoProgressColors(playedColor: Color.fromARGB(255, r, g, b), bufferedColor: Colors.blueGrey),),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton.outlined(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateColor.resolveWith(
-                            (states) => Color.fromARGB(255, r, g, b),
-                          ),
-                          iconColor: MaterialStateColor.resolveWith(
-                            (states) => const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                        splashRadius: 30,
-                        enableFeedback: true,
-                        icon: Icon(_controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow),
-                        onPressed: () {
-                          setState(() {
-                            _controller.value.isPlaying
-                                ? _controller.pause()
-                                : _controller.play();
-                          });
-                        },
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 15.0,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.bold,
                       ),
-                      IconButton.outlined(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateColor.resolveWith(
-                            (states) => Color.fromARGB(255, r, g, b),
-                          ),
-                          iconColor: MaterialStateColor.resolveWith(
-                            (states) => const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                        splashRadius: 30,
-                        enableFeedback: true,
-                        icon: const Icon(Icons.stop),
-                        onPressed: () {
-                          setState(() {
-                            _controller.pause();
-                            _controller.seekTo(Duration.zero);
-                          });
-                        },
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Row(
