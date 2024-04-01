@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
@@ -9,10 +12,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    super.key,
+    Key? key,
     required this.videoId,
     required String videoUrl,
-  });
+  }) : super(key: key);
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -23,18 +26,44 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int dislikes = 0;
   int views = 0;
   String description = '';
-  String truncatedDescription = '';
-  bool descriptionTileState = true;
   late VideoPlayerController _controller;
   String name = '';
   bool _isInitialized = false;
   String channelName = '';
   String channelAvatar = '';
+  bool _isPlayPauseVisible = false;
+  Timer? _playPauseTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchVideoData();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _playPauseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _togglePlayPauseVisibility() {
+    setState(() {
+      _isPlayPauseVisible = !_isPlayPauseVisible;
+    });
+  }
+
+  void _startPlayPauseTimer() {
+    _playPauseTimer = Timer(const Duration(seconds: 3), () {
+      if (_isPlayPauseVisible) {
+        _togglePlayPauseVisibility();
+      }
+    });
+  }
+
+  void _resetPlayPauseTimer() {
+    _playPauseTimer?.cancel();
+    _startPlayPauseTimer();
   }
 
   Future<void> _fetchVideoData() async {
@@ -48,7 +77,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           dislikes = responseData['dislikes'] ?? 0;
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
-          truncatedDescription = responseData['truncatedDescription'] ?? '';
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
@@ -62,6 +90,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           ..initialize().then((_) {
             setState(() {
               _isInitialized = true;
+              _startPlayPauseTimer();
             });
           });
       } else {
@@ -81,108 +110,125 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     int g = accentcolor.green;
     int b = accentcolor.blue;
     return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        title: Text(
+          name,
+          style: const TextStyle(
+            fontSize: 15.0,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: GestureDetector(
+        onTap: _resetPlayPauseTimer,
         child: _isInitialized
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _controller.value.isInitialized
-                      ? AspectRatio(
-                          aspectRatio: _controller.value.aspectRatio,
-                          child: Stack(
-                            alignment: FractionalOffset.bottomRight +
-                                const FractionalOffset(-0.1, -0.1),
-                            children: [
-                              VideoPlayer(_controller),
-                              Align(
-                                alignment: Alignment.center,
-                                child: GestureDetector(
+            ? SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _controller.value.isInitialized
+                        ? AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: Stack(
+                              children: [
+                                VideoPlayer(_controller),
+                                GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      _controller.value.isPlaying
-                                      ? _controller.pause()
-                                      : _controller.play();
+                                      if (_controller.value.isPlaying) {
+                                        _controller.pause();
+                                      } else {
+                                        _controller.play();
+                                      }
+                                      _togglePlayPauseVisibility();
+                                      _resetPlayPauseTimer();
                                     });
                                   },
-                                  child: Icon(
-                                    _controller.value.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                    size: 60,
+                                  child: AnimatedOpacity(
+                                    opacity: _isPlayPauseVisible ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: Container(
+                                      color: Colors.transparent,
+                                      child: Center(
+                                        child: Icon(
+                                          _controller.value.isPlaying
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child: VideoProgressIndicator(
-                                  _controller,
-                                  allowScrubbing: true,
-                                  padding: const EdgeInsets.all(10.0),
-                                  colors: VideoProgressColors(
-                                    playedColor: Color.fromARGB(255, r, g, b),
-                                    bufferedColor: Colors.blueGrey
-                                  ),
-                                ),
-                              ),
-                            ]
+                              ],
+                            ))
+                        : Container(),
+                    VideoProgressIndicator(
+                      _controller,
+                      allowScrubbing: true,
+                      padding: const EdgeInsets.all(10.0),
+                      colors: VideoProgressColors(
+                          playedColor: Color.fromARGB(255, r, g, b),
+                          bufferedColor: Colors.blueGrey),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Padding(padding: EdgeInsets.all(7.0)),
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         )
-                      : Container(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        fontStyle: FontStyle.normal,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.thumb_up_outlined),
-                      const SizedBox(width: 6),
-                      Text('$likes'),
-                      const SizedBox(width: 20),
-                      const Icon(Icons.thumb_down_outlined),
-                      const SizedBox(width: 6),
-                      Text('$dislikes'),
-                      const SizedBox(width: 20),
-                      const Text('•'),
-                      const SizedBox(width: 8),
-                      Text('$views Views'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ExpansionTile(
-                    title: const Text(
-                      'Description',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 7.0)),
+                        const Icon(Icons.thumb_up_outlined),
+                        const SizedBox(width: 6),
+                        Text('$likes'),
+                        const SizedBox(width: 20),
+                        const Icon(Icons.thumb_down_outlined),
+                        const SizedBox(width: 6),
+                        Text('$dislikes'),
+                        const SizedBox(width: 20),
+                        const Text('•'),
+                        const SizedBox(width: 8),
+                        Text('$views Views'),
+                      ],
                     ),
-                    subtitle: descriptionTileState
-                              ? Text(truncatedDescription, overflow: TextOverflow.ellipsis)
-                              : null,
-                    onExpansionChanged: (state) {
-                      setState(() {
-                        descriptionTileState = !state;
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          description,
-                          style: const TextStyle(fontSize: 13),
+                    const SizedBox(height: 10),
+                    ExpansionTile(
+                      title: const Text(
+                        'Description',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
                         ),
-                      )
-                    ],
-                  ),
-                ],
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            description,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               )
             : const Center(child: CircularProgressIndicator()),
       ),
