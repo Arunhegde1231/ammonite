@@ -110,16 +110,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     int g = accentcolor.green;
     int b = accentcolor.blue;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          name,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       body: GestureDetector(
         onTap: _resetPlayPauseTimer,
         child: _isInitialized
