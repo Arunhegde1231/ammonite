@@ -93,10 +93,13 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
-                  ),
+                  _controller.value.isInitialized
+                      ? AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: VideoPlayer(_controller),
+                        )
+                      : Container(),
+                      VideoProgressIndicator(_controller, allowScrubbing: true, padding: const EdgeInsets.all(10.0), colors: VideoProgressColors(playedColor: Color.fromARGB(255, r, g, b), bufferedColor: Colors.blueGrey),),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
