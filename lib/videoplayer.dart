@@ -90,7 +90,43 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                   _controller.value.isInitialized
                       ? AspectRatio(
                           aspectRatio: _controller.value.aspectRatio,
-                          child: VideoPlayer(_controller),
+                          child: Stack(
+                            alignment: FractionalOffset.bottomRight +
+                                const FractionalOffset(-0.1, -0.1),
+                            children: [
+                              VideoPlayer(_controller),
+                              Align(
+                                alignment: Alignment.center,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _controller.value.isPlaying
+                                      ? _controller.pause()
+                                      : _controller.play();
+                                    });
+                                  },
+                                  child: Icon(
+                                    _controller.value.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                                    size: 60,
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: VideoProgressIndicator(
+                                  _controller,
+                                  allowScrubbing: true,
+                                  padding: const EdgeInsets.all(10.0),
+                                  colors: VideoProgressColors(
+                                    playedColor: Color.fromARGB(255, r, g, b),
+                                    bufferedColor: Colors.blueGrey
+                                  ),
+                                ),
+                              ),
+                            ]
+                          ),
                         )
                       : Container(),
                   Padding(
