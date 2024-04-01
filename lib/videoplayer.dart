@@ -138,7 +138,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                       _controller.pause();
                                     } else {
                                       _controller.play();
-                                      
                                     }
                                     _togglePlayPauseVisibility();
                                     _resetPlayPauseTimer();

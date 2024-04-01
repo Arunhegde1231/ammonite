@@ -22,7 +22,7 @@ class _HomescreenState extends State<Homescreen> {
   String errorMessage = '';
 
   final ScrollController _scrollController = ScrollController();
-  bool _isVisible = false;
+  bool _isVisible = true;
 
   @override
   void initState() {
@@ -179,13 +179,13 @@ class _HomescreenState extends State<Homescreen> {
                                                   'previewPath'] !=
                                               null
                                           ? 'https://tilvids.com${video['previewPath']}'
-                                          : ''; // Provide a default value if previewPath is null
+                                          : ''; 
 
                                       final channelData = video['channel'];
                                       final channelName = channelData != null &&
                                               channelData['displayName'] != null
                                           ? channelData['displayName']
-                                          : ''; // Provide a default value if channelData or displayName is null
+                                          : ''; 
 
                                       final channelAvatar = channelData !=
                                                   null &&
@@ -193,7 +193,7 @@ class _HomescreenState extends State<Homescreen> {
                                               channelData['avatar']['path'] !=
                                                   null
                                           ? 'https://tilvids.com${channelData['avatar']['path']}'
-                                          : ''; // Provide a default value if channelData, avatar, or path is null
+                                          : ''; 
 
                                       return Column(
                                         crossAxisAlignment:
@@ -320,7 +320,8 @@ class _HomescreenState extends State<Homescreen> {
                       );
                     },
                     child: const Icon(
-                      Icons.keyboard_arrow_up,
+                      Icons.arrow_upward_outlined,
+                      size: 30,
                       color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
