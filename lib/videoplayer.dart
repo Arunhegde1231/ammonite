@@ -27,6 +27,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int views = 0;
   String description = '';
   late VideoPlayerController _controller;
+  String truncatedDescription = '';
+  bool descriptionTileState = true;
   String name = '';
   bool _isInitialized = false;
   String channelName = '';
@@ -77,6 +79,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           dislikes = responseData['dislikes'] ?? 0;
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
+          truncatedDescription = responseData['truncatedDescription'] ?? '';
+
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
@@ -121,48 +125,58 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                         ? AspectRatio(
                             aspectRatio: _controller.value.aspectRatio,
                             child: Stack(
+                              alignment: FractionalOffset.bottomCenter +
+                                  const FractionalOffset(-0.1, -0.1),
                               children: [
                                 VideoPlayer(_controller),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (_controller.value.isPlaying) {
-                                        _controller.pause();
-                                      } else {
-                                        _controller.play();
-                                      }
-                                      _togglePlayPauseVisibility();
-                                      _resetPlayPauseTimer();
-                                    });
-                                  },
-                                  child: AnimatedOpacity(
-                                    opacity: _isPlayPauseVisible ? 1.0 : 0.0,
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      child: Center(
-                                        child: Icon(
-                                          _controller.value.isPlaying
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 40,
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (_controller.value.isPlaying) {
+                                          _controller.pause();
+                                        } else {
+                                          _controller.play();
+                                        }
+                                        _togglePlayPauseVisibility();
+                                        _resetPlayPauseTimer();
+                                      });
+                                    },
+                                    child: AnimatedOpacity(
+                                      opacity: _isPlayPauseVisible ? 1.0 : 0.0,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: Container(
+                                        color: Colors.transparent,
+                                        child: Center(
+                                          child: Icon(
+                                            _controller.value.isPlaying
+                                                ? Icons.pause
+                                                : Icons.play_arrow,
+                                            color: Colors.white,
+                                            size: 40,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: VideoProgressIndicator(
+                                    _controller,
+                                    allowScrubbing: true,
+                                    padding: const EdgeInsets.all(10.0),
+                                    colors: VideoProgressColors(
+                                        playedColor:
+                                            Color.fromARGB(255, r, g, b),
+                                        bufferedColor: Colors.blueGrey),
+                                  ),
+                                ),
                               ],
                             ))
                         : Container(),
-                    VideoProgressIndicator(
-                      _controller,
-                      allowScrubbing: true,
-                      padding: const EdgeInsets.all(10.0),
-                      colors: VideoProgressColors(
-                          playedColor: Color.fromARGB(255, r, g, b),
-                          bufferedColor: Colors.blueGrey),
-                    ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
