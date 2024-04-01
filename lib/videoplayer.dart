@@ -9,10 +9,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    Key? key,
+    super.key,
     required this.videoId,
     required String videoUrl,
-  }) : super(key: key);
+  });
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -23,6 +23,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int dislikes = 0;
   int views = 0;
   String description = '';
+  String truncatedDescription = '';
+  bool descriptionTileState = true;
   late VideoPlayerController _controller;
   String name = '';
   bool _isInitialized = false;
@@ -46,6 +48,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           dislikes = responseData['dislikes'] ?? 0;
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
+          truncatedDescription = responseData['truncatedDescription'] ?? '';
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
@@ -170,6 +173,14 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
+                    subtitle: descriptionTileState
+                              ? Text(truncatedDescription, overflow: TextOverflow.ellipsis)
+                              : null,
+                    onExpansionChanged: (state) {
+                      setState(() {
+                        descriptionTileState = !state;
+                      });
+                    },
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
