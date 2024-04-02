@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   final int videoId;
@@ -27,6 +29,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int views = 0;
   String description = '';
   late VideoPlayerController _controller;
+  late ChewieController _chewieController;
   String truncatedDescription = '';
   bool descriptionTileState = true;
   String name = '';
@@ -47,6 +50,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   void dispose() {
     _controller.dispose();
     _playPauseTimer?.cancel();
+    _chewieController.dispose(); // Dispose ChewieController
     super.dispose();
   }
 
@@ -98,6 +102,35 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
               _startPlayPauseTimer();
             });
           });
+        _chewieController = ChewieController(
+          allowFullScreen: true,
+          allowedScreenSleep: true,
+          deviceOrientationsAfterFullScreen: [
+            DeviceOrientation.landscapeLeft,
+            DeviceOrientation.landscapeRight,
+            DeviceOrientation.portraitDown,
+            DeviceOrientation.portraitUp
+          ],
+          videoPlayerController: _controller,
+          aspectRatio: 16 / 9,
+          autoInitialize: true,
+          autoPlay: true,
+          showControls: true,
+        );
+        _chewieController.addListener(() {
+          if (_chewieController.isFullScreen) {
+            SystemChrome.setPreferredOrientations(
+              [
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight
+              ],
+            );
+          } else {
+            SystemChrome.setPreferredOrientations(
+              [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+            );
+          }
+        });
       } else {
         throw Exception('Failed to fetch video data: ${response.statusCode}');
       }
@@ -130,84 +163,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                 alignment: FractionalOffset.bottomCenter +
                                     const FractionalOffset(-0.1, -0.1),
                                 children: [
-                                  VideoPlayer(_controller),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (_controller.value.isPlaying) {
-                                            _controller.pause();
-                                          } else {
-                                            _controller.play();
-                                          }
-                                          _togglePlayPauseVisibility();
-                                          _resetPlayPauseTimer();
-                                        });
-                                      },
-                                      child: AnimatedOpacity(
-                                        opacity:
-                                            _isPlayPauseVisible ? 1.0 : 0.0,
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          child: Center(
-                                            child: Icon(
-                                              _controller.value.isPlaying
-                                                  ? Icons.pause
-                                                  : Icons.play_arrow,
-                                              color: Colors.white,
-                                              size: 40,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: VideoProgressIndicator(
-                                      _controller,
-                                      allowScrubbing: true,
-                                      padding: const EdgeInsets.all(10.0),
-                                      colors: VideoProgressColors(
-                                          playedColor:
-                                              Color.fromARGB(255, r, g, b),
-                                          bufferedColor: Colors.blueGrey),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: ValueListenableBuilder<
-                                        VideoPlayerValue>(
-                                      valueListenable: _controller,
-                                      builder: (context, value, child) {
-                                        final currentSecond =
-                                            value.position.inSeconds;
-                                        final currentHour =
-                                            (currentSecond ~/ 3600);
-                                        final currentMinute =
-                                            (currentSecond % 3000) ~/ 60;
-                                        final currentSeconds =
-                                            currentSecond % 60;
-                                        final durationInSeconds =
-                                            value.duration.inSeconds;
-                                        final hours = durationInSeconds ~/ 3600;
-                                        final minutes =
-                                            (durationInSeconds % 3600) ~/ 60;
-                                        final seconds = durationInSeconds % 60;
-                                        return Padding(
-                                          padding: const EdgeInsets.all(15.0),
-                                          child: Text(
-                                            '$currentHour:${currentMinute.toString().padLeft(2, '0')}:${currentSeconds.toString().padLeft(2, '0')}/$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                            style:
-                                                const TextStyle(color: Colors.white),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                  Chewie(controller: _chewieController)
                                 ],
                               ))
                           : Container(),
@@ -274,29 +230,3 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 }
-
-
-/*
-Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: ValueListenableBuilder<
-                                        VideoPlayerValue>(
-                                      valueListenable: _controller,
-                                      builder: (context, value, child) {
-                                        final durationInSeconds =
-                                            value.duration.inSeconds;
-                                        final hours = durationInSeconds ~/ 3600;
-                                        final minutes =
-                                            (durationInSeconds % 3600) ~/ 60;
-                                        final seconds = durationInSeconds % 60;
-                                        return Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Text(
-                                            '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ), */
