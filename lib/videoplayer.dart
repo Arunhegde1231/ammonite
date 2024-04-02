@@ -35,7 +35,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   String channelAvatar = '';
   bool _isPlayPauseVisible = false;
   Timer? _playPauseTimer;
-  int duration=0;
+  int duration = 0;
 
   @override
   void initState() {
@@ -81,7 +81,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
           truncatedDescription = responseData['truncatedDescription'] ?? '';
-          duration=responseData['duration'];
+          duration = responseData['duration'];
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
@@ -177,6 +177,37 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                           bufferedColor: Colors.blueGrey),
                                     ),
                                   ),
+                                  Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: ValueListenableBuilder<
+                                        VideoPlayerValue>(
+                                      valueListenable: _controller,
+                                      builder: (context, value, child) {
+                                        final currentSecond =
+                                            value.position.inSeconds;
+                                        final currentHour =
+                                            (currentSecond ~/ 3600);
+                                        final currentMinute =
+                                            (currentSecond % 3000) ~/ 60;
+                                        final currentSeconds =
+                                            currentSecond % 60;
+                                        final durationInSeconds =
+                                            value.duration.inSeconds;
+                                        final hours = durationInSeconds ~/ 3600;
+                                        final minutes =
+                                            (durationInSeconds % 3600) ~/ 60;
+                                        final seconds = durationInSeconds % 60;
+                                        return Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Text(
+                                            '$currentHour:${currentMinute.toString().padLeft(2, '0')}:${currentSeconds.toString().padLeft(2, '0')}/$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                                            style:
+                                                const TextStyle(color: Colors.white),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ))
                           : Container(),
@@ -243,3 +274,29 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 }
+
+
+/*
+Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: ValueListenableBuilder<
+                                        VideoPlayerValue>(
+                                      valueListenable: _controller,
+                                      builder: (context, value, child) {
+                                        final durationInSeconds =
+                                            value.duration.inSeconds;
+                                        final hours = durationInSeconds ~/ 3600;
+                                        final minutes =
+                                            (durationInSeconds % 3600) ~/ 60;
+                                        final seconds = durationInSeconds % 60;
+                                        return Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Text(
+                                            '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ), */
