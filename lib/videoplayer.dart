@@ -114,127 +114,129 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     int g = accentcolor.green;
     int b = accentcolor.blue;
     return Scaffold(
-      body: GestureDetector(
-        onTap: _resetPlayPauseTimer,
-        child: _isInitialized
-            ? SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _controller.value.isInitialized
-                        ? AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: Stack(
-                              alignment: FractionalOffset.bottomCenter +
-                                  const FractionalOffset(-0.1, -0.1),
-                              children: [
-                                VideoPlayer(_controller),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        if (_controller.value.isPlaying) {
-                                          _controller.pause();
-                                        } else {
-                                          _controller.play();
-                                        }
-                                        _togglePlayPauseVisibility();
-                                        _resetPlayPauseTimer();
-                                      });
-                                    },
-                                    child: AnimatedOpacity(
-                                      opacity: _isPlayPauseVisible ? 1.0 : 0.0,
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: Center(
-                                          child: Icon(
-                                            _controller.value.isPlaying
-                                                ? Icons.pause
-                                                : Icons.play_arrow,
-                                            color: Colors.white,
-                                            size: 40,
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: _resetPlayPauseTimer,
+          child: _isInitialized
+              ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _controller.value.isInitialized
+                          ? AspectRatio(
+                              aspectRatio: _controller.value.aspectRatio,
+                              child: Stack(
+                                alignment: FractionalOffset.bottomCenter +
+                                    const FractionalOffset(-0.1, -0.1),
+                                children: [
+                                  VideoPlayer(_controller),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (_controller.value.isPlaying) {
+                                            _controller.pause();
+                                          } else {
+                                            _controller.play();
+                                          }
+                                          _togglePlayPauseVisibility();
+                                          _resetPlayPauseTimer();
+                                        });
+                                      },
+                                      child: AnimatedOpacity(
+                                        opacity: _isPlayPauseVisible ? 1.0 : 0.0,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          child: Center(
+                                            child: Icon(
+                                              _controller.value.isPlaying
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                              color: Colors.white,
+                                              size: 40,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: VideoProgressIndicator(
-                                    _controller,
-                                    allowScrubbing: true,
-                                    padding: const EdgeInsets.all(10.0),
-                                    colors: VideoProgressColors(
-                                        playedColor:
-                                            Color.fromARGB(255, r, g, b),
-                                        bufferedColor: Colors.blueGrey),
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: VideoProgressIndicator(
+                                      _controller,
+                                      allowScrubbing: true,
+                                      padding: const EdgeInsets.all(10.0),
+                                      colors: VideoProgressColors(
+                                          playedColor:
+                                              Color.fromARGB(255, r, g, b),
+                                          bufferedColor: Colors.blueGrey),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ))
-                        : Container(),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Padding(padding: EdgeInsets.all(7.0)),
-                        Flexible(
-                          child: Text(
-                            name,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
+                                ],
+                              ))
+                          : Container(),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(padding: EdgeInsets.all(7.0)),
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 7.0)),
-                        const Icon(Icons.thumb_up_outlined),
-                        const SizedBox(width: 6),
-                        Text('$likes'),
-                        const SizedBox(width: 20),
-                        const Icon(Icons.thumb_down_outlined),
-                        const SizedBox(width: 6),
-                        Text('$dislikes'),
-                        const SizedBox(width: 20),
-                        const Text('•'),
-                        const SizedBox(width: 8),
-                        Text('$views Views'),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ExpansionTile(
-                      title: const Text(
-                        'Description',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
+                          )
+                        ],
                       ),
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            description,
-                            style: const TextStyle(fontSize: 13),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 7.0)),
+                          const Icon(Icons.thumb_up_outlined),
+                          const SizedBox(width: 6),
+                          Text('$likes'),
+                          const SizedBox(width: 20),
+                          const Icon(Icons.thumb_down_outlined),
+                          const SizedBox(width: 6),
+                          Text('$dislikes'),
+                          const SizedBox(width: 20),
+                          const Text('•'),
+                          const SizedBox(width: 8),
+                          Text('$views Views'),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ExpansionTile(
+                        title: const Text(
+                          'Description',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            : const Center(child: CircularProgressIndicator()),
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              description,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : const Center(child: CircularProgressIndicator()),
+        ),
       ),
     );
   }
