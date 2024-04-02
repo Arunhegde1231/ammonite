@@ -1,9 +1,11 @@
+// ignore_for_file: use_key_in_widget_constructors
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class TrendingScreen extends StatefulWidget {
-  const TrendingScreen({Key? key}) : super(key: key);
+  const TrendingScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api

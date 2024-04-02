@@ -1,3 +1,4 @@
+// ignore_for_file: use_key_in_widget_constructors, unnecessary_import, library_private_types_in_public_api
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
@@ -12,10 +13,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    Key? key,
+    super.key,
     required this.videoId,
     required String videoUrl,
-  }) : super(key: key);
+  });
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -165,6 +166,22 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           bufferedColor: Colors.blueGrey),
                     ),
                     const SizedBox(height: 10),
+                    Column(
+                      children: [
+                         Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            name,
+                            maxLines: 2,
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontStyle: FontStyle.normal,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -192,8 +209,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                       ),
                       children: [
                         ConstrainedBox(
-                          constraints: const BoxConstraints(
-                              maxHeight: 400), 
+                          constraints: const BoxConstraints(maxHeight: 400),
                           child: SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),

@@ -1,3 +1,4 @@
+// ignore_for_file: use_key_in_widget_constructors
 import 'package:ammonite/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
@@ -82,8 +83,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ),
           ],
         ),
-    ),
-    debugShowCheckedModeBanner: false,
+      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

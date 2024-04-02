@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors
+
 import 'dart:convert';
 import 'package:ammonite/categoryscreen.dart';
 import 'package:ammonite/settings.dart';

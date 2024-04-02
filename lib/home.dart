@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors
+
 import 'dart:convert';
 import 'package:ammonite/settings.dart';
 import 'package:ammonite/videoplayer.dart';
@@ -179,13 +181,13 @@ class _HomescreenState extends State<Homescreen> {
                                                   'previewPath'] !=
                                               null
                                           ? 'https://tilvids.com${video['previewPath']}'
-                                          : ''; 
+                                          : '';
 
                                       final channelData = video['channel'];
                                       final channelName = channelData != null &&
                                               channelData['displayName'] != null
                                           ? channelData['displayName']
-                                          : ''; 
+                                          : '';
 
                                       final channelAvatar = channelData !=
                                                   null &&
@@ -193,7 +195,7 @@ class _HomescreenState extends State<Homescreen> {
                                               channelData['avatar']['path'] !=
                                                   null
                                           ? 'https://tilvids.com${channelData['avatar']['path']}'
-                                          : ''; 
+                                          : '';
 
                                       return Column(
                                         crossAxisAlignment:
@@ -214,7 +216,9 @@ class _HomescreenState extends State<Homescreen> {
                                                   ),
                                                 );
                                               } else {
-                                                print(errorMessage);
+                                                if (kDebugMode) {
+                                                  print(errorMessage);
+                                                }
                                               }
                                             },
                                             child: Image.network(
