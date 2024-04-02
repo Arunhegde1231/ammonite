@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:system_theme/system_theme.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -50,7 +49,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   void dispose() {
     _controller.dispose();
     _playPauseTimer?.cancel();
-    _chewieController.dispose(); // Dispose ChewieController
+    _chewieController.dispose();
     super.dispose();
   }
 
@@ -105,6 +104,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         _chewieController = ChewieController(
           allowFullScreen: true,
           allowedScreenSleep: true,
+          allowMuting: true,
           deviceOrientationsAfterFullScreen: [
             DeviceOrientation.landscapeLeft,
             DeviceOrientation.landscapeRight,
@@ -112,7 +112,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             DeviceOrientation.portraitUp
           ],
           videoPlayerController: _controller,
-          aspectRatio: 16 / 9,
           autoInitialize: true,
           autoPlay: true,
           showControls: true,
@@ -143,10 +142,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final accentcolor = SystemTheme.accentColor.accent;
-    int r = accentcolor.red;
-    int g = accentcolor.green;
-    int b = accentcolor.blue;
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
