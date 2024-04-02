@@ -35,6 +35,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   String channelAvatar = '';
   bool _isPlayPauseVisible = false;
   Timer? _playPauseTimer;
+  int duration=0;
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
           truncatedDescription = responseData['truncatedDescription'] ?? '';
-
+          duration=responseData['duration'];
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
