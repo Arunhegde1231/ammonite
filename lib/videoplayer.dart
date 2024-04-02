@@ -1,8 +1,7 @@
-// ignore_for_file: use_key_in_widget_constructors, unnecessary_import, library_private_types_in_public_api
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -13,10 +12,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    super.key,
+    Key? key,
     required this.videoId,
     required String videoUrl,
-  });
+  }) : super(key: key);
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -28,6 +27,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int views = 0;
   String description = '';
   late VideoPlayerController _controller;
+  String truncatedDescription = '';
+  bool descriptionTileState = true;
   String name = '';
   bool _isInitialized = false;
   String channelName = '';
@@ -78,6 +79,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           dislikes = responseData['dislikes'] ?? 0;
           views = responseData['views'] ?? 0;
           description = responseData['description'] ?? '';
+          truncatedDescription = responseData['truncatedDescription'] ?? '';
+
           name = responseData['name'];
           channelName = responseData['channel']['name'];
           if (responseData['channel']['avatars'].isNotEmpty) {
@@ -115,114 +118,123 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         child: GestureDetector(
           onTap: _resetPlayPauseTimer,
           child: _isInitialized
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _controller.value.isInitialized
-                        ? AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: Stack(
-                              children: [
-                                VideoPlayer(_controller),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (_controller.value.isPlaying) {
-                                        _controller.pause();
-                                      } else {
-                                        _controller.play();
-                                      }
-                                      _togglePlayPauseVisibility();
-                                      _resetPlayPauseTimer();
-                                    });
-                                  },
-                                  child: AnimatedOpacity(
-                                    opacity: _isPlayPauseVisible ? 1.0 : 0.0,
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      child: Center(
-                                        child: Icon(
-                                          _controller.value.isPlaying
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 40,
+              ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _controller.value.isInitialized
+                          ? AspectRatio(
+                              aspectRatio: _controller.value.aspectRatio,
+                              child: Stack(
+                                alignment: FractionalOffset.bottomCenter +
+                                    const FractionalOffset(-0.1, -0.1),
+                                children: [
+                                  VideoPlayer(_controller),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (_controller.value.isPlaying) {
+                                            _controller.pause();
+                                          } else {
+                                            _controller.play();
+                                          }
+                                          _togglePlayPauseVisibility();
+                                          _resetPlayPauseTimer();
+                                        });
+                                      },
+                                      child: AnimatedOpacity(
+                                        opacity:
+                                            _isPlayPauseVisible ? 1.0 : 0.0,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          child: Center(
+                                            child: Icon(
+                                              _controller.value.isPlaying
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                              color: Colors.white,
+                                              size: 40,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container(),
-                    VideoProgressIndicator(
-                      _controller,
-                      allowScrubbing: true,
-                      padding: const EdgeInsets.all(10.0),
-                      colors: VideoProgressColors(
-                          playedColor: Color.fromARGB(255, r, g, b),
-                          bufferedColor: Colors.blueGrey),
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: [
-                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            name,
-                            maxLines: 2,
-                            style: const TextStyle(
-                                fontSize: 15,
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.thumb_up_outlined),
-                        const SizedBox(width: 6),
-                        Text('$likes'),
-                        const SizedBox(width: 20),
-                        const Icon(Icons.thumb_down_outlined),
-                        const SizedBox(width: 6),
-                        Text('$dislikes'),
-                        const SizedBox(width: 20),
-                        const Text('•'),
-                        const SizedBox(width: 8),
-                        Text('$views Views'),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ExpansionTile(
-                      title: const Text(
-                        'Description',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      children: [
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxHeight: 400),
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                description,
-                                style: const TextStyle(fontSize: 13),
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: VideoProgressIndicator(
+                                      _controller,
+                                      allowScrubbing: true,
+                                      padding: const EdgeInsets.all(10.0),
+                                      colors: VideoProgressColors(
+                                          playedColor:
+                                              Color.fromARGB(255, r, g, b),
+                                          bufferedColor: Colors.blueGrey),
+                                    ),
+                                  ),
+                                ],
+                              ))
+                          : Container(),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(padding: EdgeInsets.all(7.0)),
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 7.0)),
+                          const Icon(Icons.thumb_up_outlined),
+                          const SizedBox(width: 6),
+                          Text('$likes'),
+                          const SizedBox(width: 20),
+                          const Icon(Icons.thumb_down_outlined),
+                          const SizedBox(width: 6),
+                          Text('$dislikes'),
+                          const SizedBox(width: 20),
+                          const Text('•'),
+                          const SizedBox(width: 8),
+                          Text('$views Views'),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ExpansionTile(
+                        title: const Text(
+                          'Description',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              description,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 )
               : const Center(child: CircularProgressIndicator()),
         ),

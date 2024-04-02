@@ -112,7 +112,7 @@ class _HomescreenState extends State<Homescreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Discover'),
+          title: const Text('Home'),
           actions: [
             PopupMenuButton(
               icon: const Icon(Icons.settings_outlined),
