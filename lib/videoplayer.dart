@@ -39,6 +39,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
   bool _isPlayPauseVisible = false;
   Timer? _playPauseTimer;
   int duration = 0;
+  Comments comments = Comments();
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
     _panelController = PanelController();
     _tabController = TabController(length: 2, vsync: this);
     _fetchVideoData();
+    _fetchComments();
   }
 
   @override
@@ -140,6 +142,49 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching video data: $error');
+      }
+    }
+  }
+
+  Future<void> _fetchComments() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://www.tilvids.com/api/v1/videos/${widget.videoId}/comment-threads'));
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          comments.total = responseData['total'];
+
+          for (var item in responseData['data']) {
+            var comment = CommentItem();
+            comment.id = item['id'];
+            comment.threadId = item['threadId'];
+            comment.url = Uri.parse(item['url']);
+            comment.inReplyToCommentId = item['inReplyToCommentId'];
+            comment.videoId = item['videoId'];
+            comment.createdAt = item['createdAt'];
+            comment.updatedAt = item['updatedAt'];
+            comment.deletedAt = item['deletedAt'];
+            comment.isDeleted = item['isDeleted'];
+            comment.totalRepliesFromVideoAuthor =
+                item['totalRepliesFromVideoAuthor'];
+            comment.totalReplies = item['totalReplies'];
+            comment.text = item['text'];
+            comment.account.url = item['account']['url'];
+            comment.account.name = item['account']['name'];
+            comment.account.host = item['account']['host'];
+            comment.account.avatars = item['account']['avatars'];
+            comment.account.avatar = item['account']['avatar'];
+
+            comments.comments.add(comment);
+          }
+        });
+      } else {
+        throw Exception('Failed to fetch comments: ${response.statusCode}');
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error fetching comments: $error');
       }
     }
   }
@@ -239,9 +284,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                         ],
                       ),
                       const SizedBox(height: 10),
-                      TabBar(controller: _tabController, tabs: const [
-                        Tab(text: "Comments"),
-                        Tab(text: "Recommended"),
+                      TabBar(controller: _tabController, tabs: [
+                        Tab(text: "Comments (${comments.total})"),
+                        const Tab(text: "Recommended"),
                       ]),
                       Expanded(
                         child: TabBarView(
@@ -259,4 +304,33 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
       ),
     );
   }
+}
+
+class Comments {
+  int total = 0;
+  List<CommentItem> comments = [];
+}
+
+class CommentItem {
+  int? id;
+  int? threadId;
+  Uri? url;
+  int? inReplyToCommentId;
+  int? videoId;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  DateTime? deletedAt;
+  bool isDeleted = false;
+  int totalRepliesFromVideoAuthor = 0;
+  int totalReplies = 0;
+  Commenter account = Commenter();
+  String text = '';
+}
+
+class Commenter {
+  Uri? url;
+  String name = '';
+  String host = '';
+  dynamic avatars;
+  dynamic avatar;
 }
