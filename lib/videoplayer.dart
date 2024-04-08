@@ -206,6 +206,19 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             fontSize: 15,
                           ),
                         ),
+                        subtitle: descriptionTileState
+                            ? Text(
+                                truncatedDescription,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                softWrap: false,
+                              )
+                            : null,
+                        onExpansionChanged: (state) {
+                          setState(() {
+                            descriptionTileState = !state;
+                          });
+                        },
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
