@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -29,8 +30,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   String description = '';
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
+  late PanelController _panelController;
   String truncatedDescription = '';
-  bool descriptionTileState = true;
   String name = '';
   bool _isInitialized = false;
   String channelName = '';
@@ -130,6 +131,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             );
           }
         });
+        _panelController = PanelController();
       } else {
         throw Exception('Failed to fetch video data: ${response.statusCode}');
       }
@@ -147,8 +149,32 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         child: GestureDetector(
           onTap: _resetPlayPauseTimer,
           child: _isInitialized
-              ? SingleChildScrollView(
-                  child: Column(
+              ? SlidingUpPanel(
+                  controller: _panelController,
+                  minHeight: 0,
+                  snapPoint: 0.7,
+                  maxHeight: 700,
+                  color: const Color(0xFF000000), // TODO: Use global theme
+                  header: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Description',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  panel: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 32, 8, 8),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        description,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ),
+                  body: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _controller.value.isInitialized
@@ -162,18 +188,31 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                 ],
                               ))
                           : Container(),
-                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Padding(padding: EdgeInsets.all(7.0)),
                           Flexible(
-                            child: Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
+                            child: ExpansionTile(
+                              title: Text(
+                                name,
+                                overflow: TextOverflow.fade,
+                                maxLines: 2,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              subtitle: Text(
+                                truncatedDescription,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                softWrap: false,
+                              ),
+                              onExpansionChanged: (state) {
+                                state
+                                    ? _panelController.open()
+                                    : _panelController.close();
+                              },
                             ),
                           )
                         ],
@@ -198,37 +237,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      ExpansionTile(
-                        title: const Text(
-                          'Description',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        subtitle: descriptionTileState
-                            ? Text(
-                                truncatedDescription,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                softWrap: false,
-                              )
-                            : null,
-                        onExpansionChanged: (state) {
-                          setState(() {
-                            descriptionTileState = !state;
-                          });
-                        },
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              description,
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                          )
-                        ],
-                      ),
                     ],
                   ),
                 )
