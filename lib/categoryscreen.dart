@@ -22,7 +22,7 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
   int currentPage = 1;
   final int videosPerPage = 10;
   final ScrollController _scrollController = ScrollController();
-  bool isFetchingMore = false; 
+  bool isFetchingMore = false;
 
   @override
   void initState() {
@@ -35,8 +35,8 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
       loading = true;
     });
     try {
-      final response =
-          await http.get(Uri.parse('https://tilvids.com/api/v1/videos?count=100'));
+      final response = await http
+          .get(Uri.parse('https://tilvids.com/api/v1/videos?count=100'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
@@ -59,7 +59,6 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +98,7 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => VideoPlayerPage(
-                                            videoUrl: videoUrl,
+                                            videoUrl: Uri.parse(videoUrl),
                                             videoId: videoId),
                                       ),
                                     );
@@ -181,7 +180,7 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
                             ],
                           );
                         }
-                        return null; 
+                        return null;
                       },
                     ),
     );

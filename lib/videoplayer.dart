@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -14,10 +12,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    Key? key,
+    super.key,
     required this.videoId,
-    required String videoUrl,
-  }) : super(key: key);
+    required Uri videoUrl,
+  });
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();

@@ -19,8 +19,8 @@ class _SearchScreenState extends State<SearchScreen> {
   List<dynamic> channels = [];
   bool loading = false;
   String errorMessage = '';
-  bool showChannels = false; 
-  bool searchdone=false;
+  bool showChannels = false;
+  bool searchdone = false;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _SearchScreenState extends State<SearchScreen> {
         setState(() {
           videos = videosList;
           loading = false;
-          searchdone=true;
+          searchdone = true;
         });
       } else {
         setState(() {
@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
         setState(() {
           channels = channelList;
           loading = false;
-          showChannels = true; 
+          showChannels = true;
         });
       }
     } catch (error) {
@@ -183,25 +183,20 @@ class _SearchScreenState extends State<SearchScreen> {
               ],
             ),
           ),
-        if(searchdone)
-        const SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical:10),
-            child: Text( 
-              'Videos',
-              style:TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              )
-            )
+        if (searchdone)
+          const SliverToBoxAdapter(
+            child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text('Videos',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ))),
           ),
-        ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-             Divider(
-                color: Color.fromARGB(255, r, g, b)
-              );
+              Divider(color: Color.fromARGB(255, r, g, b));
               if (index == 0) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -214,7 +209,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 );
               }
-              final video = videos[index ];
+              final video = videos[index];
               final thumbnailURL = video['previewPath'] != null
                   ? 'https://tilvids.com${video['previewPath']}'
                   : '';
@@ -237,7 +232,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => VideoPlayerPage(
-                                videoUrl: videoUrl, videoId: videoId),
+                                videoUrl: Uri.parse(videoUrl),
+                                videoId: videoId),
                           ),
                         );
                       } else {
@@ -319,3 +315,4 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+
