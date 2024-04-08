@@ -23,7 +23,8 @@ class VideoPlayerPage extends StatefulWidget {
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
 }
 
-class _VideoPlayerPageState extends State<VideoPlayerPage> {
+class _VideoPlayerPageState extends State<VideoPlayerPage>
+    with TickerProviderStateMixin {
   int likes = 0;
   int dislikes = 0;
   int views = 0;
@@ -31,6 +32,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
   late PanelController _panelController;
+  late TabController _tabController;
   String truncatedDescription = '';
   String name = '';
   bool _isInitialized = false;
@@ -43,6 +45,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   @override
   void initState() {
     super.initState();
+    _panelController = PanelController();
+    _tabController = TabController(length: 2, vsync: this);
     _fetchVideoData();
   }
 
@@ -51,6 +55,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     _controller.dispose();
     _playPauseTimer?.cancel();
     _chewieController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -131,7 +136,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             );
           }
         });
-        _panelController = PanelController();
       } else {
         throw Exception('Failed to fetch video data: ${response.statusCode}');
       }
@@ -237,6 +241,18 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                         ],
                       ),
                       const SizedBox(height: 10),
+                      TabBar(controller: _tabController, tabs: const [
+                        Tab(text: "Comments"),
+                        Tab(text: "Recommended"),
+                      ]),
+                      Expanded(
+                        child: TabBarView(
+                            controller: _tabController,
+                            children: const [
+                              Text("Comments"),
+                              Text("Recommended"),
+                            ]),
+                      ),
                     ],
                   ),
                 )
