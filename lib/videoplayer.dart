@@ -38,6 +38,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   bool _isPlayPauseVisible = false;
   Timer? _playPauseTimer;
   int duration = 0;
+  List<CommentItem> comments = [];
 
   @override
   void initState() {
@@ -74,26 +75,30 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> _fetchVideoData() async {
     try {
-      final response = await http.get(
+      final videoResponse = await http.get(
           Uri.parse('https://www.tilvids.com/api/v1/videos/${widget.videoId}'));
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+      final commentsResponse = await http.get(Uri.parse(
+          'https://www.tilvids.com/api/v1/videos/${widget.videoId}/comment-threads'));
+      if (videoResponse.statusCode == 200 &&
+          commentsResponse.statusCode == 200) {
+        final videoData = json.decode(videoResponse.body);
+        final commentsData = json.decode(commentsResponse.body);
         setState(() {
-          likes = responseData['likes'] ?? 0;
-          dislikes = responseData['dislikes'] ?? 0;
-          views = responseData['views'] ?? 0;
-          description = responseData['description'] ?? '';
-          truncatedDescription = responseData['truncatedDescription'] ?? '';
-          duration = responseData['duration'];
-          name = responseData['name'];
-          channelName = responseData['channel']['name'];
-          if (responseData['channel']['avatars'].isNotEmpty) {
-            channelAvatar = responseData['channel']['avatars'][1]['path'];
+          likes = videoData['likes'] ?? 0;
+          dislikes = videoData['dislikes'] ?? 0;
+          views = videoData['views'] ?? 0;
+          description = videoData['description'] ?? '';
+          truncatedDescription = videoData['truncatedDescription'] ?? '';
+          duration = videoData['duration'];
+          name = videoData['name'];
+          channelName = videoData['channel']['displayName'];
+          if (videoData['channel']['avatar'].isNotEmpty) {
+            channelAvatar = videoData['channel']['avatar']['path'];
           }
+          comments = _parseComments(commentsData);
         });
 
-        final playlistUrl =
-            responseData['streamingPlaylists'][0]['playlistUrl'];
+        final playlistUrl = videoData['streamingPlaylists'][0]['playlistUrl'];
         _controller = VideoPlayerController.networkUrl(Uri.parse(playlistUrl))
           ..initialize().then((_) {
             setState(() {
@@ -131,13 +136,40 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           }
         });
       } else {
-        throw Exception('Failed to fetch video data: ${response.statusCode}');
+        throw Exception('Failed to fetch video data');
       }
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching video data: $error');
       }
     }
+  }
+
+  List<CommentItem> _parseComments(dynamic commentsData) {
+    List<CommentItem> parsedComments = [];
+    for (var item in commentsData['data']) {
+      var comment = CommentItem();
+      comment.id = item['id'];
+      comment.threadId = item['threadId'];
+      comment.url = Uri.parse(item['url']);
+      comment.inReplyToCommentId = item['inReplyToCommentId'];
+      comment.videoId = item['videoId'];
+      comment.createdAt = DateTime.parse(item['createdAt']);
+      comment.updatedAt = DateTime.parse(item['updatedAt']);
+      comment.deletedAt =
+          item['deletedAt'] != null ? DateTime.parse(item['deletedAt']) : null;
+      comment.isDeleted = item['isDeleted'];
+      comment.totalRepliesFromVideoAuthor = item['totalRepliesFromVideoAuthor'];
+      comment.totalReplies = item['totalReplies'];
+      comment.text = item['text'];
+      comment.account.url = Uri.parse(item['account']['url']);
+      comment.account.name = item['account']['name'];
+      comment.account.host = item['account']['host'];
+      comment.account.avatars = item['account']['avatars'];
+      comment.account.avatar = item['account']['avatar'];
+      parsedComments.add(comment);
+    }
+    return parsedComments;
   }
 
   @override
@@ -160,7 +192,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                 children: [
                                   Chewie(controller: _chewieController)
                                 ],
-                              ))
+                              ),
+                            )
                           : Container(),
                       const SizedBox(height: 10),
                       Row(
@@ -168,12 +201,54 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                         children: [
                           const Padding(padding: EdgeInsets.all(7.0)),
                           Flexible(
-                            child: Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.6),
+                                  child: TextButton(
+                                    style: ButtonStyle(
+                                      enableFeedback: true,
+                                      padding:
+                                          MaterialStateProperty.all<EdgeInsets>(
+                                              EdgeInsets.zero),
+                                    ),
+                                    onPressed: () {}, // add action later
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              'https://tilvids.com$channelAvatar'),
+                                          radius: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            channelName,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           )
                         ],
@@ -216,6 +291,22 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           )
                         ],
                       ),
+                      const SizedBox(height: 10),
+                      ExpansionTile(
+                        title: const Text(
+                          'Comments',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: _buildComments(),
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 )
@@ -224,4 +315,49 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       ),
     );
   }
+
+  Widget _buildComments() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: comments.length,
+      itemBuilder: (context, index) {
+        final comment = comments[index];
+        String plainTextComment = removeHtmlTags(comment.text);
+        return ListTile(
+          subtitle: Text(plainTextComment),
+          title: Text(comment.account.name, style: const TextStyle(fontWeight: FontWeight.bold),),
+        );
+      },
+    );
+  }
+}
+
+String removeHtmlTags(String htmlText) {
+  RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+  return htmlText.replaceAll(exp, '');
+}
+
+class CommentItem {
+  int? id;
+  int? threadId;
+  Uri? url;
+  int? inReplyToCommentId;
+  int? videoId;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  DateTime? deletedAt;
+  bool isDeleted = false;
+  int totalRepliesFromVideoAuthor = 0;
+  int totalReplies = 0;
+  Commenter account = Commenter();
+  String text = '';
+}
+
+class Commenter {
+  Uri? url;
+  String name = '';
+  String host = '';
+  dynamic avatars;
+  dynamic avatar;
 }
