@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -13,10 +11,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    Key? key,
+    super.key,
     required this.videoId,
     required String videoUrl,
-  }) : super(key: key);
+  });
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -319,7 +317,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   Widget _buildComments() {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: comments.length,
       itemBuilder: (context, index) {
         final comment = comments[index];
