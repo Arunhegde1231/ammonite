@@ -324,7 +324,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         String plainTextComment = removeHtmlTags(comment.text);
         return ListTile(
           subtitle: Text(plainTextComment),
-          title: Text(comment.account.name, style: const TextStyle(fontWeight: FontWeight.bold),),
+          title: Text(
+            comment.account.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         );
       },
     );
