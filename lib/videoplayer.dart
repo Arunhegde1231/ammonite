@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -11,10 +12,10 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    super.key,
+    Key? key,
     required this.videoId,
     required String videoUrl,
-  });
+  }) : super(key: key);
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
@@ -27,6 +28,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   String description = '';
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
+  late PanelController _panelController = PanelController();
   String truncatedDescription = '';
   bool descriptionTileState = true;
   String name = '';
@@ -81,6 +83,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           commentsResponse.statusCode == 200) {
         final videoData = json.decode(videoResponse.body);
         final commentsData = json.decode(commentsResponse.body);
+
         setState(() {
           likes = videoData['likes'] ?? 0;
           dislikes = videoData['dislikes'] ?? 0;
@@ -147,6 +150,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     List<CommentItem> parsedComments = [];
     for (var item in commentsData['data']) {
       var comment = CommentItem();
+
       comment.id = item['id'];
       comment.threadId = item['threadId'];
       comment.url = Uri.parse(item['url']);
@@ -177,8 +181,30 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         child: GestureDetector(
           onTap: _resetPlayPauseTimer,
           child: _isInitialized
-              ? SingleChildScrollView(
-                  child: Column(
+              ? SlidingUpPanel(
+                  controller: _panelController,
+                  minHeight: 0,
+                  maxHeight: 525,
+                  snapPoint: 0.7,
+                  color: Colors.black,
+                  header: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Description',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                  ),
+                  panel: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 32, 8, 8),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        description,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ),
+                  body: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _controller.value.isInitialized
@@ -194,109 +220,104 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             )
                           : Container(),
                       const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(padding: EdgeInsets.all(7.0)),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ExpansionTile(
+                            shape: Border(
+                                top: BorderSide.none,
+                                bottom: BorderSide.none,
+                                left: BorderSide.none,
+                                right: BorderSide.none),
+                            title: Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onExpansionChanged: (state) {
+                              state
+                                  ? _panelController.open()
+                                  : _panelController.close();
+                            },
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(7, 5, 8, 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  name,
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              0.6),
-                                  child: TextButton(
-                                    style: ButtonStyle(
-                                      enableFeedback: true,
-                                      padding:
-                                          MaterialStateProperty.all<EdgeInsets>(
-                                              EdgeInsets.zero),
-                                    ),
-                                    onPressed: () {}, // add action later
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              'https://tilvids.com$channelAvatar'),
-                                          radius: 20,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            channelName,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 7.0)),
+                                const Icon(Icons.thumb_up_outlined),
+                                const SizedBox(width: 6),
+                                Text('$likes'),
+                                const SizedBox(width: 20),
+                                const Icon(Icons.thumb_down_outlined),
+                                const SizedBox(width: 6),
+                                Text('$dislikes'),
+                                const SizedBox(width: 20),
+                                const Text('•'),
+                                const SizedBox(width: 8),
+                                Text('$views Views'),
                               ],
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 7.0)),
-                          const Icon(Icons.thumb_up_outlined),
-                          const SizedBox(width: 6),
-                          Text('$likes'),
-                          const SizedBox(width: 20),
-                          const Icon(Icons.thumb_down_outlined),
-                          const SizedBox(width: 6),
-                          Text('$dislikes'),
-                          const SizedBox(width: 20),
-                          const Text('•'),
-                          const SizedBox(width: 8),
-                          Text('$views Views'),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      ExpansionTile(
-                        title: const Text(
-                          'Description',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
                           ),
-                        ),
-                        children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              description,
-                              style: const TextStyle(fontSize: 13),
+                            padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                enableFeedback: true,
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.zero,
+                                ),
+                              ),
+                              onPressed: () {}, // add action later
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      'https://tilvids.com$channelAvatar',
+                                    ),
+                                    radius: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Expanded(
+                                      child: Text(
+                                        channelName,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),
                       ExpansionTile(
-                        title: const Text(
-                          'Comments',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
+                        title: RichText(
+                          text: TextSpan(children: [
+                            WidgetSpan(
+                                child: Icon(
+                              Icons.comment_outlined,
+                              size: 25,
+                            )),
+                            TextSpan(
+                                text: "  Comments",
+                                style: TextStyle(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.bold,
+                                    textBaseline: TextBaseline.alphabetic))
+                          ]),
                         ),
                         children: [
                           Padding(
@@ -315,21 +336,34 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   }
 
   Widget _buildComments() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: comments.length,
-      itemBuilder: (context, index) {
-        final comment = comments[index];
-        String plainTextComment = removeHtmlTags(comment.text);
-        return ListTile(
-          subtitle: Text(plainTextComment),
-          title: Text(
-            comment.account.name,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        );
-      },
+    return SizedBox(
+      height: 300,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 300,
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: comments.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final comment = comments[index];
+                  String plainTextComment = removeHtmlTags(comment.text);
+                  return ListTile(
+                    subtitle: Text(plainTextComment),
+                    title: Text(
+                      comment.account.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
