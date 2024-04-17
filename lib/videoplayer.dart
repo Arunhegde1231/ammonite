@@ -31,6 +31,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
   late PanelController _panelController = PanelController();
+  late ExpansionTileController _descController = ExpansionTileController();
   String truncatedDescription = '';
   String name = '';
   bool _isInitialized = false;
@@ -39,7 +40,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
   bool _isPlayPauseVisible = false;
   Timer? _playPauseTimer;
   int duration = 0;
-  List<CommentItem> comments = [];
+  Comments comments = Comments();
 
   @override
   void initState() {
@@ -148,8 +149,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
     }
   }
 
-  List<CommentItem> _parseComments(dynamic commentsData) {
-    List<CommentItem> parsedComments = [];
+  Comments _parseComments(dynamic commentsData) {
+    Comments parsedComments = Comments();
+    parsedComments.total = commentsData['total'];
     for (var item in commentsData['data']) {
       var comment = CommentItem();
 
@@ -171,7 +173,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
       comment.account.host = item['account']['host'];
       comment.account.avatars = item['account']['avatars'];
       comment.account.avatar = item['account']['avatar'];
-      parsedComments.add(comment);
+      parsedComments.data.add(comment);
     }
     return parsedComments;
   }
@@ -184,27 +186,50 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
           onTap: _resetPlayPauseTimer,
           child: _isInitialized
               ? SlidingUpPanel(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25)),
                   controller: _panelController,
                   minHeight: 0,
                   maxHeight: 525,
                   snapPoint: 0.7,
                   color: Colors.black,
-                  header: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Description',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  onPanelClosed: () {
+                    _descController.collapse();
+                  },
+                  // TODO: Align the button to the right
+                  header: Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () => _panelController.close(),
+                              icon: Icon(Icons.close)),
+                        ],
+                      ),
                     ),
                   ),
-                  panel: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 32, 8, 8),
-                    child: SingleChildScrollView(
-                      child: Text(
-                        description,
-                        style: const TextStyle(fontSize: 13),
-                      ),
+                  // TODO: Figure out how to use PopScope
+                  panelBuilder: (ScrollController sc) => Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 46, 16, 0),
+                    child: ListView(
+                      controller: sc,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          description,
+                          style: const TextStyle(fontSize: 13),
+                        )
+                      ],
                     ),
                   ),
                   body: Column(
@@ -227,6 +252,12 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ExpansionTile(
+                            controller: _descController,
+                            subtitle: Text(
+                              truncatedDescription,
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                            ),
                             shape: Border(
                                 top: BorderSide.none,
                                 bottom: BorderSide.none,
@@ -234,6 +265,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                                 right: BorderSide.none),
                             title: Text(
                               name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -307,7 +340,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                       ),
                       const SizedBox(height: 10),
                       ExpansionTile(
-                        
                         title: RichText(
                           text: TextSpan(children: [
                             WidgetSpan(
@@ -316,7 +348,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                               size: 25,
                             )),
                             TextSpan(
-                                text: "  Comments",
+                                text: "  Comments (${comments.total})",
                                 style: TextStyle(
                                     fontSize: 21,
                                     fontWeight: FontWeight.bold,
@@ -350,10 +382,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
               height: 250,
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: comments.length,
+                itemCount: comments.data.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  final comment = comments[index];
+                  final comment = comments.data[index];
                   String plainTextComment = removeHtmlTags(comment.text);
                   return ListTile(
                     subtitle: Text(plainTextComment),
@@ -403,6 +435,5 @@ class Commenter {
 
 class Comments {
   int total = 0;
-  List<CommentItem> comments = [];
+  List<CommentItem> data = [];
 }
-
