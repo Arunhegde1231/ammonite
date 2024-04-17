@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -12,16 +13,17 @@ class VideoPlayerPage extends StatefulWidget {
   final int videoId;
 
   const VideoPlayerPage({
-    Key? key,
+    super.key,
     required this.videoId,
-    required String videoUrl,
-  }) : super(key: key);
+    required Uri videoUrl,
+  });
 
   @override
   _VideoPlayerPageState createState() => _VideoPlayerPageState();
 }
 
-class _VideoPlayerPageState extends State<VideoPlayerPage> {
+class _VideoPlayerPageState extends State<VideoPlayerPage>
+    with TickerProviderStateMixin {
   int likes = 0;
   int dislikes = 0;
   int views = 0;
@@ -30,7 +32,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   late ChewieController _chewieController;
   late PanelController _panelController = PanelController();
   String truncatedDescription = '';
-  bool descriptionTileState = true;
   String name = '';
   bool _isInitialized = false;
   String channelName = '';
@@ -43,6 +44,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   @override
   void initState() {
     super.initState();
+    _panelController = PanelController();
     _fetchVideoData();
   }
 
@@ -182,6 +184,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           onTap: _resetPlayPauseTimer,
           child: _isInitialized
               ? SlidingUpPanel(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
                   controller: _panelController,
                   minHeight: 0,
                   maxHeight: 525,
@@ -243,7 +246,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             },
                           ),
                           Padding(
-                            padding: EdgeInsets.fromLTRB(7, 5, 8, 8),
+                            padding: EdgeInsets.fromLTRB(7, 0, 8, 8),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -304,6 +307,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                       ),
                       const SizedBox(height: 10),
                       ExpansionTile(
+                        
                         title: RichText(
                           text: TextSpan(children: [
                             WidgetSpan(
@@ -343,7 +347,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 300,
+              height: 250,
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: comments.length,
@@ -396,3 +400,9 @@ class Commenter {
   dynamic avatars;
   dynamic avatar;
 }
+
+class Comments {
+  int total = 0;
+  List<CommentItem> comments = [];
+}
+
