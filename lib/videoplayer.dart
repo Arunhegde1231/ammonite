@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -114,12 +113,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
           allowFullScreen: true,
           allowedScreenSleep: true,
           allowMuting: true,
-          deviceOrientationsAfterFullScreen: [
-            DeviceOrientation.landscapeLeft,
-            DeviceOrientation.landscapeRight,
-            DeviceOrientation.portraitDown,
-            DeviceOrientation.portraitUp
-          ],
           videoPlayerController: _controller,
           autoInitialize: true,
           autoPlay: true,
@@ -200,7 +193,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage>
                   // TODO: Align the button to the right
                   header: Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(5.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -437,3 +430,7 @@ class Comments {
   int total = 0;
   List<CommentItem> data = [];
 }
+
+/*
+
+*/
