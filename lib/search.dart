@@ -232,7 +232,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => VideoPlayerPage(
-                                videoUrl: Uri.parse(videoUrl),
                                 videoId: videoId),
                           ),
                         );

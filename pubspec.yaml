@@ -19,7 +19,7 @@ dependencies:
   webview_flutter: ^4.7.0
   chewie: ^1.0.0
   sliding_up_panel: ^2.0.0+1
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

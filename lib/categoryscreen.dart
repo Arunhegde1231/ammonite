@@ -97,9 +97,8 @@ class _CategoryVideosScreenState extends State<CategoryVideosScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VideoPlayerPage(
-                                            videoUrl: Uri.parse(videoUrl),
-                                            videoId: videoId),
+                                        builder: (context) =>
+                                            VideoPlayerPage(videoId: videoId),
                                       ),
                                     );
                                   } else {
