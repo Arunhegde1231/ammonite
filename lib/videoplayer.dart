@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:ammonite/channelscreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   final int videoId;
@@ -217,11 +217,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                   IconButton(
                                       padding: EdgeInsets.all(3),
                                       onPressed: () {},
-                                      icon: Icon(Icons.share_outlined)),
+                                      icon: FaIcon(FontAwesomeIcons.share)),
                                   IconButton(
                                       padding: EdgeInsets.all(3),
                                       onPressed: _showDownloadOptions,
-                                      icon: Icon(Icons.download_outlined)),
+                                      icon: FaIcon(FontAwesomeIcons.download)),
                                 ],
                               )),
                           Padding(
