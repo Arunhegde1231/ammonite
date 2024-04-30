@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:ammonite/channelscreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -92,66 +93,67 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     }
   }
 
-void _showDownloadOptions() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Download Options'),
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Select Quality:'),
-                ListTile(
-                  title: Text('High Quality'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // TODO: Add functionality to download high-quality video
-                  },
-                ),
-                ListTile(
-                  title: Text('Medium Quality'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // TODO: Add functionality to download medium-quality video
-                  },
-                ),
-                ListTile(
-                  title: Text('Low Quality'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // TODO: Add functionality to download low-quality video
-                  },
-                ),
-                SizedBox(height: 20),
-                Text('Select Download Location:'),
-                ElevatedButton(
-                  onPressed: () async {
-                    List<Directory>? externalStorageDirectories =
-                        await getExternalStorageDirectories();
-                    if (externalStorageDirectories != null &&
-                        externalStorageDirectories.isNotEmpty) {
-                      String selectedFolder =
-                          externalStorageDirectories.first.path;
-                      setState(() {
-                        // Handle selected folder path
-                        print('Selected folder path: $selectedFolder');
-                      });
-                    }
-                  },
-                  child: Text('Select Folder'),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    },
-  );
-}
+  void _showDownloadOptions() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Download Options'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Select Quality:'),
+                  ListTile(
+                    title: Text('High Quality'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: Add functionality to download high-quality video
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Medium Quality'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: Add functionality to download medium-quality video
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Low Quality'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: Add functionality to download low-quality video
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Text('Select Download Location:'),
+                  ElevatedButton(
+                    onPressed: () async {
+                      List<Directory>? externalStorageDirectories =
+                          await getExternalStorageDirectories();
+                      if (externalStorageDirectories != null &&
+                          externalStorageDirectories.isNotEmpty) {
+                        String selectedFolder =
+                            externalStorageDirectories.first.path;
+                        setState(() {
+                          // Handle selected folder path
+                          print('Selected folder path: $selectedFolder');
+                        });
+                      }
+                    },
+                    child: Text('Select Folder'),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,7 +233,12 @@ void _showDownloadOptions() {
                                   EdgeInsets.zero,
                                 ),
                               ),
-                              onPressed: () {}, //TODO: add actions later
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ChannelScreen()));
+                              },
                               child: Column(
                                 children: [
                                   Row(
