@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
+import 'package:path_provider/path_provider.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   final int videoId;
@@ -90,6 +92,66 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     }
   }
 
+void _showDownloadOptions() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Download Options'),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Select Quality:'),
+                ListTile(
+                  title: Text('High Quality'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Add functionality to download high-quality video
+                  },
+                ),
+                ListTile(
+                  title: Text('Medium Quality'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Add functionality to download medium-quality video
+                  },
+                ),
+                ListTile(
+                  title: Text('Low Quality'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    // TODO: Add functionality to download low-quality video
+                  },
+                ),
+                SizedBox(height: 20),
+                Text('Select Download Location:'),
+                ElevatedButton(
+                  onPressed: () async {
+                    List<Directory>? externalStorageDirectories =
+                        await getExternalStorageDirectories();
+                    if (externalStorageDirectories != null &&
+                        externalStorageDirectories.isNotEmpty) {
+                      String selectedFolder =
+                          externalStorageDirectories.first.path;
+                      setState(() {
+                        // Handle selected folder path
+                        print('Selected folder path: $selectedFolder');
+                      });
+                    }
+                  },
+                  child: Text('Select Folder'),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    },
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,13 +209,16 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                   const Text('•'),
                                   const SizedBox(width: 8),
                                   Text('$views Views'),
+                                  const SizedBox(width: 8),
+                                  const Text('•'),
+                                  const SizedBox(width: 8),
                                   IconButton(
                                       padding: EdgeInsets.all(3),
                                       onPressed: () {},
                                       icon: Icon(Icons.share_outlined)),
                                   IconButton(
                                       padding: EdgeInsets.all(3),
-                                      onPressed: () {},
+                                      onPressed: _showDownloadOptions,
                                       icon: Icon(Icons.download_outlined)),
                                 ],
                               )),
@@ -181,13 +246,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                       const SizedBox(width: 8),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Expanded(
-                                          child: Text(
-                                            channelName,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                        child: Text(
+                                          channelName,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
@@ -206,3 +269,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 }
+/*
+
+ */

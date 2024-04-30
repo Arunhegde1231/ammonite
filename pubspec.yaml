@@ -17,7 +17,7 @@ dependencies:
   system_theme: ^2.3.1
   video_player: ^2.8.3
   webview_flutter: ^4.7.0
-  chewie: ^1.0.0
+  chewie: ^1.8.1
   sliding_up_panel: ^2.0.0+1
   
 dev_dependencies:
