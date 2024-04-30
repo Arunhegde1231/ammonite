@@ -19,6 +19,14 @@ class VideoPlayerPage extends StatefulWidget {
 }
 
 class _VideoPlayerPageState extends State<VideoPlayerPage> {
+  int likes = 0;
+  int dislikes = 0;
+  int views = 0;
+  int followerCount = 0;
+  String truncatedDescription = '';
+  String name = '';
+  String channelName = '';
+  String channelAvatar = '';
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
   bool _isInitialized = false;
@@ -42,6 +50,18 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           Uri.parse('https://www.tilvids.com/api/v1/videos/${widget.videoId}'));
       if (videoResponse.statusCode == 200) {
         final videoData = json.decode(videoResponse.body);
+        setState(() {
+          likes = videoData['likes'] ?? 0;
+          dislikes = videoData['dislikes'] ?? 0;
+          views = videoData['views'] ?? 0;
+          truncatedDescription = videoData['truncatedDescription'] ?? '';
+          name = videoData['name'];
+          channelName = videoData['channel']['displayName'];
+          followerCount = videoData['account']['followersCount'];
+          if (videoData['channel']['avatar'].isNotEmpty) {
+            channelAvatar = videoData['channel']['avatar']['path'];
+          }
+        });
 
         final playlistUrl = videoData['streamingPlaylists'][0]['playlistUrl'];
         _controller = VideoPlayerController.networkUrl(Uri.parse(playlistUrl))
