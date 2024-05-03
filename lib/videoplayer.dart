@@ -1,13 +1,16 @@
+// video_player_page.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:ammonite/channelscreen.dart';
+import 'package:ammonite/videodescription.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class VideoPlayerPage extends StatefulWidget {
@@ -28,6 +31,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   int views = 0;
   int followerCount = 0;
   String truncatedDescription = '';
+  String description = '';
   String name = '';
   String channelName = '';
   String channelAvatar = '';
@@ -59,6 +63,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           dislikes = videoData['dislikes'] ?? 0;
           views = videoData['views'] ?? 0;
           truncatedDescription = videoData['truncatedDescription'] ?? '';
+          description = videoData['description'] ?? '';
           name = videoData['name'];
           channelName = videoData['channel']['displayName'];
           followerCount = videoData['account']['followersCount'];
@@ -154,6 +159,18 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 
+  void _showDescriptionPanel() {
+    showModalBottomSheet(
+      backgroundColor: Colors.black,
+      elevation: 5.0,
+      enableDrag: true,
+      context: context,
+      builder: (BuildContext context) {
+        return VideoDescription(description: description);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,118 +181,133 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                      _controller.value.isInitialized
-                          ? AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
-                              child: Stack(
-                                alignment: FractionalOffset.bottomCenter +
-                                    const FractionalOffset(-0.1, -0.1),
-                                children: [
-                                  Chewie(controller: _chewieController),
-                                ],
-                              ),
-                            )
-                          : Container(),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(7.0),
+                    _controller.value.isInitialized
+                        ? AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: Stack(
+                              alignment: FractionalOffset.bottomCenter +
+                                  const FractionalOffset(-0.1, -0.1),
+                              children: [
+                                Chewie(controller: _chewieController),
+                              ],
+                            ),
+                          )
+                        : Container(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(7.0),
+                          child: GestureDetector(
+                            onTap: _showDescriptionPanel,
                             child: Text(
                               name,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 17, fontWeight: FontWeight.bold),
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(0, 5, 7, 7),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 7.0)),
-                                  const Icon(Icons.thumb_up_outlined),
-                                  const SizedBox(width: 6),
-                                  Text('$likes'),
-                                  const SizedBox(width: 20),
-                                  const Icon(Icons.thumb_down_outlined),
-                                  const SizedBox(width: 6),
-                                  Text('$dislikes'),
-                                  const SizedBox(width: 20),
-                                  const Text('•'),
-                                  const SizedBox(width: 8),
-                                  Text('$views Views'),
-                                  const SizedBox(width: 8),
-                                  const Text('•'),
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                      padding: EdgeInsets.all(3),
-                                      onPressed: () {},
-                                      icon: FaIcon(FontAwesomeIcons.share)),
-                                  IconButton(
-                                      padding: EdgeInsets.all(3),
-                                      onPressed: _showDownloadOptions,
-                                      icon: FaIcon(FontAwesomeIcons.download)),
-                                ],
-                              )),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
-                            child: TextButton(
-                              style: ButtonStyle(
-                                enableFeedback: true,
-                                padding: MaterialStateProperty.all<EdgeInsets>(
-                                  EdgeInsets.zero,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ChannelScreen()));
-                              },
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          'https://tilvids.com$channelAvatar',
-                                        ),
-                                        radius: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          channelName,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 5, 7, 7),
+                          child: Text(
+                            truncatedDescription,
+                            maxLines: 2,
+                            overflow: TextOverflow.fade,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 5, 7, 7),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 7.0)),
+                              const Icon(Icons.thumb_up_outlined),
+                              const SizedBox(width: 6),
+                              Text('$likes'),
+                              const SizedBox(width: 20),
+                              const Icon(Icons.thumb_down_outlined),
+                              const SizedBox(width: 6),
+                              Text('$dislikes'),
+                              const SizedBox(width: 20),
+                              const Text('•'),
+                              const SizedBox(width: 8),
+                              Text('$views Views'),
+                              const SizedBox(width: 8),
+                              const Text('•'),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                  padding: EdgeInsets.all(3),
+                                  onPressed: () {},
+                                  icon: FaIcon(FontAwesomeIcons.share)),
+                              IconButton(
+                                  padding: EdgeInsets.all(3),
+                                  onPressed: _showDownloadOptions,
+                                  icon: FaIcon(FontAwesomeIcons.download)),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
+                          child: TextButton(
+                            style: ButtonStyle(
+                              enableFeedback: true,
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.zero,
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                    ])
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChannelScreen(),
+                                ),
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        'https://tilvids.com$channelAvatar',
+                                      ),
+                                      radius: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        channelName,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
               : const Center(child: CircularProgressIndicator()),
         ),
       ),
     );
   }
 }
-/*
-
- */
