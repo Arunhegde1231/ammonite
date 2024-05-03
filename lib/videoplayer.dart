@@ -215,7 +215,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(0, 5, 7, 7),
+                          padding: EdgeInsets.fromLTRB(7, 5, 7, 7),
                           child: Text(
                             truncatedDescription,
                             maxLines: 2,
@@ -311,3 +311,60 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 }
+/*
+import 'package:flutter/material.dart';
+import 'package:system_theme/system_theme.dart';
+
+class VideoDescription extends StatelessWidget {
+  final String description;
+  final bool isPanelVisible;
+
+  const VideoDescription({
+    Key? key,
+    required this.description,
+    required this.isPanelVisible,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = SystemTheme.isDark;
+
+    Color backgroundColor;
+    Color textColor;
+
+    if (isDarkMode) {
+      backgroundColor = Colors.black;
+      textColor = Colors.white;
+    } else {
+      backgroundColor = Colors.white;
+      textColor = Colors.black;
+    }
+
+    return Container(
+      color: backgroundColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_upward_rounded),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  description,
+                  style: TextStyle(fontSize: 16, color: textColor),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+ */
