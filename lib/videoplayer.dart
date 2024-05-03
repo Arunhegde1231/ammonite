@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ammonite/channelscreen.dart';
+import 'package:ammonite/videocomments.dart';
 import 'package:ammonite/videodescription.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/foundation.dart';
@@ -171,6 +172,14 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 
+  void _showCommentsPanel() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return VideoComments(videoId:widget.videoId);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -219,7 +228,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           child: Text(
                             truncatedDescription,
                             maxLines: 2,
-                            overflow: TextOverflow.fade,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 14),
                           ),
                         ),
@@ -296,6 +305,25 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                       ),
                                     ),
                                   ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
+                          child: GestureDetector(
+                            onTap: _showCommentsPanel,
+                            child: Row(
+                              children: [
+                                const Icon(Icons.arrow_drop_up_outlined),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Comments',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),

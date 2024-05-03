@@ -10,19 +10,12 @@ class VideoDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context);
-    var mode = isDarkMode.brightness;
+    final isDarkMode = Theme.of(context).brightness;
 
-    Color backgroundColor;
-    Color textColor;
-
-    if (mode == Brightness.dark) {
-      backgroundColor = Colors.black;
-      textColor = Colors.white;
-    } else {
-      backgroundColor = Colors.white;
-      textColor = Colors.black;
-    }
+    Color backgroundColor =
+        isDarkMode == Brightness.dark ? Colors.black : Colors.white;
+    Color textColor =
+        isDarkMode == Brightness.dark ? Colors.white : Colors.black;
 
     return Container(
       color: backgroundColor,
