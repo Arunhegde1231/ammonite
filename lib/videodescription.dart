@@ -19,41 +19,54 @@ class VideoDescription extends StatelessWidget {
 
     return Container(
       color: backgroundColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  child: Row(
-                    children: [Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 5,5,5),
-                      child: Text('Description', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),),
-                    )],
+      child: DraggableScrollableSheet(
+        expand: true,
+        initialChildSize: 1.0,
+        builder: (_, controller) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 5, 5, 5),
+                          child: Text(
+                            'Description',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close_outlined),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: controller,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    description,
+                    style: TextStyle(fontSize: 16, color: textColor),
                   ),
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.close_outlined),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  description,
-                  style: TextStyle(fontSize: 16, color: textColor),
-                ),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

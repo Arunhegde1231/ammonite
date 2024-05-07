@@ -162,7 +162,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   void _showDescriptionPanel() {
     showModalBottomSheet(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.transparent,
       elevation: 5.0,
       enableDrag: true,
       context: context,
@@ -176,7 +176,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
-          return VideoComments(videoId:widget.videoId);
+          return VideoComments(videoId: widget.videoId);
         });
   }
 
@@ -212,58 +212,66 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           padding: EdgeInsets.all(7.0),
                           child: GestureDetector(
                             onTap: _showDescriptionPanel,
-                            child: Text(
-                              name,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(Icons.expand_more_rounded),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  truncatedDescription,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(7, 5, 7, 7),
-                          child: Text(
-                            truncatedDescription,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(0, 5, 7, 7),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 7.0)),
-                              const Icon(Icons.thumb_up_outlined),
-                              const SizedBox(width: 6),
-                              Text('$likes'),
-                              const SizedBox(width: 20),
-                              const Icon(Icons.thumb_down_outlined),
-                              const SizedBox(width: 6),
-                              Text('$dislikes'),
-                              const SizedBox(width: 20),
-                              const Text('•'),
-                              const SizedBox(width: 8),
-                              Text('$views Views'),
-                              const SizedBox(width: 8),
-                              const Text('•'),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                  padding: EdgeInsets.all(3),
-                                  onPressed: () {},
-                                  icon: FaIcon(FontAwesomeIcons.share)),
-                              IconButton(
-                                  padding: EdgeInsets.all(3),
-                                  onPressed: _showDownloadOptions,
-                                  icon: FaIcon(FontAwesomeIcons.download)),
-                            ],
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 7.0)),
+                            const Icon(Icons.thumb_up_outlined),
+                            const SizedBox(width: 6),
+                            Text('$likes'),
+                            const SizedBox(width: 20),
+                            const Icon(Icons.thumb_down_outlined),
+                            const SizedBox(width: 6),
+                            Text('$dislikes'),
+                            const SizedBox(width: 20),
+                            const Text('•'),
+                            const SizedBox(width: 8),
+                            Text('$views Views'),
+                            const SizedBox(width: 8),
+                            const Text('•'),
+                            const SizedBox(width: 8),
+                            IconButton(
+                                padding: EdgeInsets.all(3),
+                                onPressed: () {},
+                                icon: FaIcon(FontAwesomeIcons.share)),
+                            IconButton(
+                                padding: EdgeInsets.all(3),
+                                onPressed: _showDownloadOptions,
+                                icon: FaIcon(FontAwesomeIcons.download)),
+                          ],
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
