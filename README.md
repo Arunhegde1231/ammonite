@@ -4,7 +4,7 @@
 
 ## How to build from source
 
-<p>To build the app from source, follow these steps</p>
+<p>To build the app from source, follow these steps:</p>
 <ol> 
 <li>Clone the source code <br> <br>
 
