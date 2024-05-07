@@ -175,6 +175,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   void _showCommentsPanel() {
     showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.transparent,
+        elevation: 5.0,
+        enableDrag: true,
         builder: (BuildContext context) {
           return VideoComments(videoId: widget.videoId);
         });
@@ -322,10 +325,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
                           child: GestureDetector(
                             onTap: _showCommentsPanel,
-                            child: Row(
+                            child: const Row(
                               children: [
-                                const Icon(Icons.arrow_drop_up_outlined),
-                                const SizedBox(width: 8),
                                 Text(
                                   'Comments',
                                   style: const TextStyle(
@@ -333,6 +334,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                SizedBox(height: 4),
+                                Icon(Icons.expand_more_rounded),
                               ],
                             ),
                           ),

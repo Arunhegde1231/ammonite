@@ -20,7 +20,8 @@ dependencies:
   chewie: ^1.8.1
   sliding_up_panel: ^2.0.0+1
   font_awesome_flutter: ^10.7.0
-  
+  flutter_widget_from_html: ^0.15.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

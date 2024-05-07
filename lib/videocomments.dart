@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 
 class Comment {
@@ -35,22 +36,25 @@ class VideoComments extends StatefulWidget {
 }
 
 class _VideoCommentsState extends State<VideoComments> {
+  late int totalComments;
   late List<Comment> commentsData;
 
   @override
   void initState() {
     super.initState();
     commentsData = [];
+    totalComments = 0;
     _fetchComments();
   }
 
   Future<void> _fetchComments() async {
     try {
-      final response =
-          await http.get(Uri.parse('https://example.com/comments'));
+      final response = await http.get(Uri.parse(
+          "https://tilvids.com/api/v1/videos/${widget.videoId}/comment-threads"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final List<dynamic> commentsList = responseData['comments'] ?? [];
+        totalComments = responseData['total'] ?? 0;
+        final List<dynamic> commentsList = responseData['data'] ?? [];
         setState(() {
           commentsData = commentsList.map((data) {
             return Comment(
@@ -82,65 +86,74 @@ class _VideoCommentsState extends State<VideoComments> {
         isDarkMode == Brightness.dark ? Colors.white : Colors.black;
 
     return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  child: Row(
+      color: backgroundColor,
+      child: DraggableScrollableSheet(
+          expand: true,
+          initialChildSize: 1.0,
+          builder: (_, controller) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 5, 5, 5),
-                        child: Text(
-                          'Description',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                      Expanded(
+                        child: Container(
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(15, 5, 5, 5),
+                                child: Text(
+                                  "Comments (${totalComments})",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                      )
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close_outlined),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                     ],
                   ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.close_outlined),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                    itemCount: commentsData.length,
-                    itemBuilder: (context, index) {
-                      final comment = commentsData[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(comment.account.avatar.path),
-                        ),
-                        title: Text(
-                          comment.account.displayName,
-                          style: TextStyle(color: textColor),
-                        ),
-                        subtitle: Text(
-                          comment.text,
-                          style: TextStyle(color: textColor),
-                        ),
-                      );
-                    }),
-              ),
-            ),
-          ),
-        ],
-      ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView.builder(
+                          controller: controller,
+                          itemCount: commentsData.length,
+                          itemBuilder: (context, index) {
+                            final comment = commentsData[index];
+                            return ListTile(
+                              title: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 16,
+                                    backgroundImage: NetworkImage(
+                                        comment.account.avatar.path),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    comment.account.displayName,
+                                    style: TextStyle(color: textColor),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: HtmlWidget(comment.text),
+                              ),
+                            );
+                          }),
+                    ),
+                  ),
+                ],
+              )),
     );
   }
 }
