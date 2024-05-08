@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VideoDescription extends StatelessWidget {
   final String description;
@@ -58,9 +60,15 @@ class VideoDescription extends StatelessWidget {
                 controller: controller,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    description,
-                    style: TextStyle(fontSize: 16, color: textColor),
+                  child: Linkify(
+                    onOpen: (link) async {
+                      if (!await launchUrl(Uri.parse(link.url))) {
+                        throw Exception('cannot open ${link.url}');
+                      }
+                    },
+                    text: description,
+                    style: TextStyle(color: textColor),
+                    linkStyle: TextStyle(color: const Color.fromARGB(255, 7, 7, 255)),
                   ),
                 ),
               ),
