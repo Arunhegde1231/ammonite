@@ -17,8 +17,11 @@ dependencies:
   system_theme: ^2.3.1
   video_player: ^2.8.3
   webview_flutter: ^4.7.0
-  chewie: ^1.0.0
+  chewie: ^1.8.1
   sliding_up_panel: ^2.0.0+1
+  font_awesome_flutter: ^10.7.0
+  flutter_widget_from_html: ^0.15.0
+  flutter_linkify: ^6.0.0
 
 dev_dependencies:
   flutter_test:

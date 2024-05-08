@@ -22,12 +22,6 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
 android {
     namespace "com.example.ammonite"
     compileSdk flutter.compileSdkVersion
@@ -57,26 +51,17 @@ android {
         versionName flutterVersionName
     }
 
-    signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
-       }
-   }
-   buildTypes {
-       release {
-           signingConfig signingConfigs.release
-       }
-   }
-
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
 }
 
 flutter {
     source '../..'
 }
 
-dependencies {
-    implementation "androidx.activity:activity:1.6.0-alpha05"
-}
+dependencies {}

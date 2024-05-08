@@ -231,9 +231,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VideoPlayerPage(
-                                videoUrl: Uri.parse(videoUrl),
-                                videoId: videoId),
+                            builder: (context) =>
+                                VideoPlayerPage(videoId: videoId),
                           ),
                         );
                       } else {
@@ -315,4 +314,3 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
-
