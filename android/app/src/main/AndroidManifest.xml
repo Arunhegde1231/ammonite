@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application    
         android:label="ammonite"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
