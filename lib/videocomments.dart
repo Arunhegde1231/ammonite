@@ -62,7 +62,7 @@ class _VideoCommentsState extends State<VideoComments> {
               account: Account(
                 displayName: data['account']['displayName'] ?? '',
                 avatar: Avatar(
-                  path: data['account']['avatar']['path'] ?? '',
+                  path: data['account']['avatar']['path'] ?? '', 
                 ),
               ),
             );
