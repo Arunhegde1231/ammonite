@@ -8,6 +8,7 @@ import 'package:ammonite/videodescription.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
@@ -162,193 +163,200 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     );
   }
 
-  void _showDescriptionPanel() {
-    showModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      elevation: 5.0,
-      enableDrag: true,
-      context: context,
-      builder: (BuildContext context) {
-        return VideoDescription(description: description);
-      },
-    );
-  }
-
-  void _showCommentsPanel() {
-    showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        elevation: 5.0,
-        enableDrag: true,
-        builder: (BuildContext context) {
-          return VideoComments(videoId: widget.videoId);
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {},
-          child: _isInitialized
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _controller.value.isInitialized
-                        ? AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: Stack(
-                              alignment: FractionalOffset.bottomCenter +
-                                  const FractionalOffset(-0.1, -0.1),
-                              children: [
-                                Chewie(controller: _chewieController),
-                              ],
-                            ),
-                          )
-                        : Container(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(7.0),
-                          child: GestureDetector(
-                            onTap: _showDescriptionPanel,
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        name,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true, canvasColor: Colors.transparent),
+      home: Scaffold(
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () {},
+            child: _isInitialized
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _controller.value.isInitialized
+                          ? AspectRatio(
+                              aspectRatio: _controller.value.aspectRatio,
+                              child: Stack(
+                                alignment: FractionalOffset.bottomCenter +
+                                    const FractionalOffset(-0.1, -0.1),
+                                children: [
+                                  Chewie(controller: _chewieController),
+                                ],
+                              ),
+                            )
+                          : Container(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(7.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20.0))),
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 5.0,
+                                  enableDrag: true,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return VideoDescription(
+                                        description: description);
+                                  },
+                                );
+                              },
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(Icons.expand_more_rounded),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  truncatedDescription,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 7.0)),
-                            const Icon(Icons.thumb_up_outlined),
-                            const SizedBox(width: 6),
-                            Text('$likes'),
-                            const SizedBox(width: 20),
-                            const Icon(Icons.thumb_down_outlined),
-                            const SizedBox(width: 6),
-                            Text('$dislikes'),
-                            const SizedBox(width: 20),
-                            const Text('•'),
-                            const SizedBox(width: 8),
-                            Text('$views Views'),
-                            const SizedBox(width: 8),
-                            const Text('•'),
-                            const SizedBox(width: 8),
-                            IconButton(
-                                padding: EdgeInsets.all(3),
-                                onPressed: () {
-                                  Share.share(widget.videoUrl);
-                                },
-                                icon: FaIcon(FontAwesomeIcons.share)),
-                            IconButton(
-                                padding: EdgeInsets.all(3),
-                                onPressed: _showDownloadOptions,
-                                icon: FaIcon(FontAwesomeIcons.download)),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
-                          child: TextButton(
-                            style: ButtonStyle(
-                              enableFeedback: true,
-                              padding: WidgetStateProperty.all<EdgeInsets>(
-                                EdgeInsets.zero,
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.expand_more_rounded),
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    truncatedDescription,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ],
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChannelScreen(),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 7.0)),
+                              const Icon(Icons.thumb_up_outlined),
+                              const SizedBox(width: 6),
+                              Text('$likes'),
+                              const SizedBox(width: 20),
+                              const Icon(Icons.thumb_down_outlined),
+                              const SizedBox(width: 6),
+                              Text('$dislikes'),
+                              const SizedBox(width: 20),
+                              const Text('•'),
+                              const SizedBox(width: 8),
+                              Text('$views Views'),
+                              const SizedBox(width: 8),
+                              const Text('•'),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                  padding: EdgeInsets.all(3),
+                                  onPressed: () {
+                                    Share.share(widget.videoUrl);
+                                  },
+                                  icon: FaIcon(FontAwesomeIcons.share)),
+                              IconButton(
+                                  padding: EdgeInsets.all(3),
+                                  onPressed: _showDownloadOptions,
+                                  icon: FaIcon(FontAwesomeIcons.download)),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                enableFeedback: true,
+                                padding: WidgetStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.zero,
                                 ),
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        'https://tilvids.com$channelAvatar',
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChannelScreen(),
+                                  ),
+                                );
+                              },
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          'https://tilvids.com$channelAvatar',
+                                        ),
+                                        radius: 20,
                                       ),
-                                      radius: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        channelName,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
+                                      const SizedBox(width: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          channelName,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
-                          child: GestureDetector(
-                            onTap: _showCommentsPanel,
-                            child: const Row(
-                              children: [
-                                Text(
-                                  'Comments',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    ],
                                   ),
-                                ),
-                                SizedBox(height: 4),
-                                Icon(Icons.expand_more_rounded),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              : const Center(child: CircularProgressIndicator()),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 5, 8, 8),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 5.0,
+                                    enableDrag: true,
+                                    builder: (BuildContext context) {
+                                      return VideoComments(
+                                          videoId: widget.videoId);
+                                    });
+                              },
+                              child: const Row(
+                                children: [
+                                  Text(
+                                    'Comments',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Icon(Icons.expand_more_rounded),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : const Center(child: CircularProgressIndicator()),
+          ),
         ),
       ),
     );

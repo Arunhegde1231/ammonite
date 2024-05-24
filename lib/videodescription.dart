@@ -28,9 +28,12 @@ class VideoDescription extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: [ 
+              children: [
                 Expanded(
                   child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(25))),
                     child: Row(
                       children: [
                         Padding(
@@ -68,7 +71,8 @@ class VideoDescription extends StatelessWidget {
                     },
                     text: description,
                     style: TextStyle(color: textColor),
-                    linkStyle: TextStyle(color: const Color.fromARGB(255, 7, 7, 255)),
+                    linkStyle:
+                        TextStyle(color: const Color.fromARGB(255, 7, 7, 255)),
                   ),
                 ),
               ),
