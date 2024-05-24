@@ -28,7 +28,7 @@ class VideoDescription extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: [
+              children: [ 
                 Expanded(
                   child: Container(
                     child: Row(

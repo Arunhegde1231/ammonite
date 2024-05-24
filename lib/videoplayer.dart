@@ -12,13 +12,16 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   final int videoId;
+  final String videoUrl;
 
   const VideoPlayerPage({
     Key? key,
     required this.videoId,
+    required this.videoUrl,
   }) : super(key: key);
 
   @override
@@ -267,7 +270,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             const SizedBox(width: 8),
                             IconButton(
                                 padding: EdgeInsets.all(3),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Share.share(widget.videoUrl);
+                                },
                                 icon: FaIcon(FontAwesomeIcons.share)),
                             IconButton(
                                 padding: EdgeInsets.all(3),

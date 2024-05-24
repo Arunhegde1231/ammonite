@@ -22,6 +22,7 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   flutter_widget_from_html: ^0.15.0
   flutter_linkify: ^6.0.0
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:

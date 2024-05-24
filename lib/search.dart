@@ -232,7 +232,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                VideoPlayerPage(videoId: videoId),
+                                VideoPlayerPage(videoId: videoId, videoUrl: videoUrl,),
                           ),
                         );
                       } else {

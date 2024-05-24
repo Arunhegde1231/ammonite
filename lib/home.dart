@@ -211,7 +211,7 @@ class _HomescreenState extends State<Homescreen> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         VideoPlayerPage(
-                                                            videoId: videoId),
+                                                            videoId: videoId, videoUrl: videoUrl,),
                                                   ),
                                                 );
                                               } else {
