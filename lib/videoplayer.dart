@@ -280,7 +280,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           child: TextButton(
                             style: ButtonStyle(
                               enableFeedback: true,
-                              padding: MaterialStateProperty.all<EdgeInsets>(
+                              padding: WidgetStateProperty.all<EdgeInsets>(
                                 EdgeInsets.zero,
                               ),
                             ),
