@@ -5,11 +5,12 @@ import 'package:ammonite/settings.dart';
 import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 const List<String> list = <String>['Latest', 'Trending', 'Local Videos'];
+const int pageSize = 50;
 
 class Homescreen extends StatefulWidget {
   const Homescreen({Key? key});
@@ -19,68 +20,44 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  List<dynamic> videos = [];
-  bool loading = true;
-  String errorMessage = '';
-
-  final ScrollController _scrollController = ScrollController();
-  bool _isVisible = true;
+  final PagingController<int, dynamic> _pagingController =
+      PagingController(firstPageKey: 0);
 
   @override
   void initState() {
     super.initState();
-    fetchVideos();
-    _scrollController.addListener(_scrollListener);
-  }
-
-  void _scrollListener() {
-    final isScrolledToTop = _scrollController.position.pixels <= 0;
-
-    if (_scrollController.position.userScrollDirection ==
-        ScrollDirection.reverse) {
-      setState(() {
-        _isVisible = !isScrolledToTop;
-      });
-    } else {
-      setState(() {
-        _isVisible = false;
-      });
-    }
-  }
-
-  Future<void> _refreshVideos() async {
-    await fetchVideos();
-  }
-
-  Future<void> fetchVideos() async {
-    setState(() {
-      loading = true;
+    _pagingController.addPageRequestListener((pageKey) {
+      fetchVideos(pageKey);
     });
+  }
+
+  Future<void> fetchVideos(int pageKey) async {
     try {
-      final response = await http
-          .get(Uri.parse('https://tilvids.com/api/v1/videos?count=50'));
+      final response = await http.get(Uri.parse(
+          'https://tilvids.com/api/v1/videos?start=$pageKey&&count=$pageSize'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
-        setState(() {
-          videos = videosList;
-          loading = false;
-        });
+        final isLastPage = videosList.length < pageSize;
+        if (isLastPage) {
+          _pagingController.appendLastPage(videosList);
+        } else {
+          final nextPageKey = pageKey + pageSize;
+          _pagingController.appendPage(videosList, nextPageKey);
+        }
       } else {
-        setState(() {
-          errorMessage = 'Failed to load videos: ${response.statusCode}';
-          loading = false;
-        });
+        _pagingController.error =
+            'Failed to load videos: ${response.statusCode}';
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching videos: $error');
-      }
-      setState(() {
-        errorMessage = 'Error fetching videos $error';
-        loading = false;
-      });
+      _pagingController.error = 'Error fetching videos $error';
     }
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -155,182 +132,121 @@ class _HomescreenState extends State<Homescreen> {
           ],
         ),
         body: RefreshIndicator(
-          onRefresh: _refreshVideos,
-          child: Stack(
-            children: [
-              CustomScrollView(
-                controller: _scrollController,
-                slivers: <Widget>[
-                  loading
-                      ? const SliverFillRemaining(
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      : errorMessage.isNotEmpty
-                          ? SliverFillRemaining(
-                              child: Center(child: Text(errorMessage)),
-                            )
-                          : videos.isEmpty
-                              ? const SliverFillRemaining(
-                                  child: Center(child: Text('No videos found')),
-                                )
-                              : SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (BuildContext context, int index) {
-                                      final video = videos[index];
-                                      final thumbnailURL = video[
-                                                  'previewPath'] !=
-                                              null
-                                          ? 'https://tilvids.com${video['previewPath']}'
-                                          : '';
+          onRefresh: () => Future.sync(
+            () => _pagingController.refresh(),
+          ),
+          child: PagedListView<int, dynamic>(
+            pagingController: _pagingController,
+            builderDelegate: PagedChildBuilderDelegate<dynamic>(
+              itemBuilder: (context, video, index) {
+                final thumbnailURL = video['previewPath'] != null
+                    ? 'https://tilvids.com${video['previewPath']}'
+                    : '';
 
-                                      final channelData = video['channel'];
-                                      final channelName = channelData != null &&
-                                              channelData['displayName'] != null
-                                          ? channelData['displayName']
-                                          : '';
+                final channelData = video['channel'];
+                final channelName =
+                    channelData != null && channelData['displayName'] != null
+                        ? channelData['displayName']
+                        : '';
 
-                                      final channelAvatar = channelData !=
-                                                  null &&
-                                              channelData['avatar'] != null &&
-                                              channelData['avatar']['path'] !=
-                                                  null
-                                          ? 'https://tilvids.com${channelData['avatar']['path']}'
-                                          : '';
+                final channelAvatar = channelData != null &&
+                        channelData['avatar'] != null &&
+                        channelData['avatar']['path'] != null
+                    ? 'https://tilvids.com${channelData['avatar']['path']}'
+                    : '';
 
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              final videoUrl = video['url'];
-                                              final videoId = video['id'];
-                                              if (videoUrl is String) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        VideoPlayerPage(
-                                                            videoId: videoId, videoUrl: videoUrl,),
-                                                  ),
-                                                );
-                                              } else {
-                                                if (kDebugMode) {
-                                                  print(errorMessage);
-                                                }
-                                              }
-                                            },
-                                            child: Image.network(
-                                              thumbnailURL,
-                                              width: double.maxFinite,
-                                              height: 240,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 10, left: 6),
-                                            child: Row(
-                                              children: [
-                                                if (channelAvatar.isNotEmpty)
-                                                  CircleAvatar(
-                                                    radius: 20,
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                            channelAvatar),
-                                                  ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        video['name'] ?? '',
-                                                        style: const TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontFamily:
-                                                              'RobotoMono',
-                                                        ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 3,
-                                                      ),
-                                                      const SizedBox(height: 2),
-                                                      if (channelName
-                                                          .isNotEmpty)
-                                                        Text(
-                                                          '$channelName',
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: Colors
-                                                                .grey[600],
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 53, top: 6),
-                                            child: Row(
-                                              children: [
-                                                const Icon(
-                                                    Icons.thumb_up_outlined),
-                                                const SizedBox(width: 6),
-                                                Text('${video['likes'] ?? 0}'),
-                                                const SizedBox(width: 6),
-                                                const Icon(
-                                                    Icons.thumb_down_outlined),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                    '${video['dislikes'] ?? 0}'),
-                                                const SizedBox(width: 8),
-                                                const Text('•'),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                    '${video['views'] ?? 0} Views'),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                        ],
-                                      );
-                                    },
-                                    childCount: videos.length,
-                                  ),
-                                ),
-                ],
-              ),
-              Positioned(
-                bottom: 16.0,
-                right: 16.0,
-                child: Visibility(
-                  visible: !_isVisible,
-                  child: FloatingActionButton(
-                    backgroundColor: Color.fromARGB(255, r, g, b),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0.0,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut,
-                      );
-                    },
-                    child: const Icon(
-                      Icons.arrow_upward_outlined,
-                      size: 30,
-                      color: Color.fromARGB(255, 0, 0, 0),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        final videoUrl = video['url'];
+                        final videoId = video['id'];
+                        if (videoUrl is String) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoPlayerPage(
+                                videoId: videoId,
+                                videoUrl: videoUrl,
+                              ),
+                            ),
+                          );
+                        } else {
+                          if (kDebugMode) {
+                            print('Invalid video URL');
+                          }
+                        }
+                      },
+                      child: Image.network(
+                        thumbnailURL,
+                        width: double.maxFinite,
+                        height: 240,
+                        fit: BoxFit.fill,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Row(
+                        children: [
+                          if (channelAvatar.isNotEmpty)
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundImage: NetworkImage(channelAvatar),
+                            ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  video['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'RobotoMono',
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 3,
+                                ),
+                                const SizedBox(height: 2),
+                                if (channelName.isNotEmpty)
+                                  Text(
+                                    '$channelName',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 53, top: 6),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.thumb_up_outlined),
+                          const SizedBox(width: 6),
+                          Text('${video['likes'] ?? 0}'),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.thumb_down_outlined),
+                          const SizedBox(width: 6),
+                          Text('${video['dislikes'] ?? 0}'),
+                          const SizedBox(width: 8),
+                          const Text('•'),
+                          const SizedBox(width: 8),
+                          Text('${video['views'] ?? 0} Views'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

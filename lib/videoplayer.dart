@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:system_theme/system_theme.dart';
 import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -37,6 +38,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   String truncatedDescription = '';
   String description = '';
   String name = '';
+  String channelRealName = '';
   String channelName = '';
   String channelAvatar = '';
   late VideoPlayerController _controller;
@@ -63,6 +65,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       if (videoResponse.statusCode == 200) {
         final videoData = json.decode(videoResponse.body);
         setState(() {
+          channelRealName = videoData['channel']['name'];
           likes = videoData['likes'] ?? 0;
           dislikes = videoData['dislikes'] ?? 0;
           views = videoData['views'] ?? 0;
@@ -165,9 +168,33 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final accentcolor = SystemTheme.accentColor.accent;
+    int r = accentcolor.red;
+    int g = accentcolor.green;
+    int b = accentcolor.blue;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, canvasColor: Colors.transparent),
+      theme: ThemeData(
+        useMaterial3: true,
+        canvasColor: Colors.transparent,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromARGB(255, r, g, b),
+          brightness: Brightness.light,
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontSize: 72,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromARGB(255, r, g, b),
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: Scaffold(
         body: SafeArea(
           child: GestureDetector(
@@ -199,7 +226,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             child: GestureDetector(
                               onTap: () {
                                 showModalBottomSheet<void>(
-                                  
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(20.0))),
@@ -290,7 +316,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ChannelScreen(),
+                                    builder: (context) => ChannelScreen(
+                                      channelName: channelRealName,
+                                    ),
                                   ),
                                 );
                               },
