@@ -34,6 +34,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
   bool loading = true;
   String errorMessage = '';
 
+  @override
   void initState() {
     super.initState();
     fetchChannelVideos();
@@ -65,8 +66,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
           } else {
             channelBanner = channelData['banners'][0]['path'];
           }
-          if (channelData['avatars'][1].isNotEmpty) {
-            channelAvatar = channelData['avatars']['1']['path'];
+          if (channelData['avatars'].isNotEmpty) {
+            channelAvatar = channelData['avatars'][1]['path'];
           } else {
             channelAvatar = channelData['avatar']['path'];
           }
@@ -117,12 +118,95 @@ class _ChannelScreenState extends State<ChannelScreen> {
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-          appBar: AppBar(
-            title: Text('$channelDisplayName'),
-          ),
-          body: const Center(
-            child: Column(),
-          )),
+        appBar: AppBar(
+          title: Text(widget.channelDisplayName),
+        ),
+        body: loading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 125,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(16),
+                              bottomRight: Radius.circular(16),
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage('https://tilvids.com$channelBanner'),
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -50,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage('https://tilvids.com$channelAvatar'),
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 60),
+                    Text(
+                      channelDisplayName,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Text(
+                      channelName,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    'Followers',
+                                    style:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  Text(
+                                    followerCount.toString(),
+                                    style:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    'Following',
+                                    style:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  Text(
+                                    followingCount.toString(),
+                                    style:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
     );
   }
 }
