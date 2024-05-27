@@ -317,6 +317,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ChannelScreen(
+                                      channelDisplayName: channelName,
                                       channelName: channelRealName,
                                     ),
                                   ),
