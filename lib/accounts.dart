@@ -40,7 +40,7 @@ class _AccountScreenState extends State<AccountScreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Settings'),
+          title: const Text('Accounts'),
         ),
       ),
     );

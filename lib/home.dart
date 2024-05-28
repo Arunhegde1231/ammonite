@@ -1,13 +1,14 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'dart:convert';
-import 'package:ammonite/settings.dart';
-import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'settings.dart';
+import 'videoplayer.dart';
 
 const List<String> list = <String>['Latest', 'Trending', 'Local Videos'];
 const int pageSize = 50;
@@ -22,19 +23,35 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   final PagingController<int, dynamic> _pagingController =
       PagingController(firstPageKey: 0);
+  String instanceURL = 'https://tilvids.com';
 
   @override
   void initState() {
     super.initState();
+    _loadInstanceURL();
     _pagingController.addPageRequestListener((pageKey) {
       fetchVideos(pageKey);
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadInstanceURL();
+  }
+
+  Future<void> _loadInstanceURL() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+    });
+    _pagingController.refresh(); 
+  }
+
   Future<void> fetchVideos(int pageKey) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://tilvids.com/api/v1/videos?start=$pageKey&&count=$pageSize'));
+          '$instanceURL/api/v1/videos?start=$pageKey&&count=$pageSize'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
@@ -91,23 +108,16 @@ class _HomescreenState extends State<Homescreen> {
         appBar: AppBar(
           title: const Text('Home'),
           actions: [
-            PopupMenuButton(
-              icon: const Icon(Icons.settings_outlined),
-              itemBuilder: (BuildContext context) => [
-                const PopupMenuItem(
-                  value: 'account',
-                  child: Text('Account'),
-                ),
-              ],
-              onSelected: (String value) {
-                if (value == 'account') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: ((context) => const SettingsScreen()),
-                    ),
-                  );
-                }
+            IconButton(
+              icon: Icon(Icons.settings_outlined),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                ).then((_) =>
+                    _loadInstanceURL()); // Refresh instance URL on return
               },
             ),
             PopupMenuButton(
@@ -125,7 +135,8 @@ class _HomescreenState extends State<Homescreen> {
                     MaterialPageRoute(
                       builder: ((context) => const SettingsScreen()),
                     ),
-                  );
+                  ).then((_) =>
+                      _loadInstanceURL()); // Refresh instance URL on return
                 }
               },
             ),
@@ -140,7 +151,7 @@ class _HomescreenState extends State<Homescreen> {
             builderDelegate: PagedChildBuilderDelegate<dynamic>(
               itemBuilder: (context, video, index) {
                 final thumbnailURL = video['previewPath'] != null
-                    ? 'https://tilvids.com${video['previewPath']}'
+                    ? '$instanceURL${video['previewPath']}'
                     : '';
 
                 final channelData = video['channel'];
@@ -152,7 +163,7 @@ class _HomescreenState extends State<Homescreen> {
                 final channelAvatar = channelData != null &&
                         channelData['avatar'] != null &&
                         channelData['avatar']['path'] != null
-                    ? 'https://tilvids.com${channelData['avatar']['path']}'
+                    ? '$instanceURL${channelData['avatar']['path']}'
                     : '';
 
                 return Column(

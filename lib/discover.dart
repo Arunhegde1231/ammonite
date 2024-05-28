@@ -7,23 +7,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen() : super();
 
   @override
-  // ignore: library_private_types_in_public_api
   _DiscoverScreenState createState() => _DiscoverScreenState();
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
   List<Map<String, dynamic>> categoriesWithIcons = [];
   bool loading = true;
+  String instanceURL = 'https://tilvids.com';
 
   @override
   void initState() {
     super.initState();
-    fetchCategories();
+    _loadInstanceURL();
+  }
+
+  Future<void> _loadInstanceURL() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+    });
+    fetchCategories(); // Fetch categories after loading the instance URL
   }
 
   Future<void> fetchCategories() async {
@@ -32,8 +41,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     });
 
     try {
-      final response = await http
-          .get(Uri.parse('https://tilvids.com/api/v1/videos/categories'));
+      final response =
+          await http.get(Uri.parse('$instanceURL/api/v1/videos/categories'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -152,7 +161,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     MaterialPageRoute(
                       builder: ((context) => const SettingsScreen()),
                     ),
-                  );
+                  ).then((_) =>
+                      _loadInstanceURL()); // Reload instance URL on return
                 }
               },
             ),
@@ -171,7 +181,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     MaterialPageRoute(
                       builder: ((context) => const SettingsScreen()),
                     ),
-                  );
+                  ).then((_) =>
+                      _loadInstanceURL()); // Reload instance URL on return
                 }
               },
             ),

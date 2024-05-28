@@ -1,10 +1,11 @@
 // ignore_for_file: use_key_in_widget_constructors
 
+import 'dart:convert';
 import 'package:ammonite/videoplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:system_theme/system_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key});
@@ -21,11 +22,20 @@ class _SearchScreenState extends State<SearchScreen> {
   String errorMessage = '';
   bool showChannels = false;
   bool searchdone = false;
+  String instanceURL = 'https://tilvids.com';
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _loadInstanceURL();
+  }
+
+  Future<void> _loadInstanceURL() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+    });
   }
 
   Future<void> fetchVideos(String searchTerm) async {
@@ -34,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
     try {
       final response = await http.get(Uri.parse(
-          'https://tilvids.com/api/v1/search/videos?search=$searchTerm&count=15'));
+          '$instanceURL/api/v1/search/videos?search=$searchTerm&count=15'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> videosList = responseData['data'];
@@ -63,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
     try {
       final response2 = await http.get(Uri.parse(
-          'https://tilvids.com/api/v1/search/video-channels?search=$searchTerm'));
+          '$instanceURL/api/v1/search/video-channels?search=$searchTerm'));
       if (response2.statusCode == 200) {
         final responseData2 = json.decode(response2.body);
         final List<dynamic> channelList = responseData2['data'];
@@ -158,7 +168,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       final List<dynamic> avatars = ownerAccount['avatars'];
                       final avatarPath =
                           avatars.isNotEmpty ? avatars[1]['path'] : '';
-                      final avatar = 'https://tilvids.com$avatarPath';
+                      final avatar = '$instanceURL$avatarPath';
                       final channelname = ownerAccount['displayName'];
 
                       return Padding(
@@ -211,14 +221,14 @@ class _SearchScreenState extends State<SearchScreen> {
               }
               final video = videos[index];
               final thumbnailURL = video['previewPath'] != null
-                  ? 'https://tilvids.com${video['previewPath']}'
+                  ? '$instanceURL${video['previewPath']}'
                   : '';
               final channelData = video['channel'];
               final channelName =
                   channelData != null ? channelData['displayName'] : '';
               final channelAvatar =
                   channelData != null && channelData['avatar'] != null
-                      ? 'https://tilvids.com${channelData['avatar']['path']}'
+                      ? '$instanceURL${channelData['avatar']['path']}'
                       : '';
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,8 +241,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                VideoPlayerPage(videoId: videoId, videoUrl: videoUrl,),
+                            builder: (context) => VideoPlayerPage(
+                              videoId: videoId,
+                              videoUrl: videoUrl,
+                            ),
                           ),
                         );
                       } else {

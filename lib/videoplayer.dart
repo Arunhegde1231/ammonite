@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -44,13 +45,21 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
   bool _isInitialized = false;
+  String instanceURL = 'https://tilvids.com';
 
   @override
   void initState() {
     super.initState();
-    _fetchVideoData();
+    _loadInstanceURL();
   }
 
+Future<void> _loadInstanceURL() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+    });
+    _fetchVideoData(); 
+  }
   @override
   void dispose() {
     _controller.dispose();
@@ -60,8 +69,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> _fetchVideoData() async {
     try {
-      final videoResponse = await http.get(
-          Uri.parse('https://www.tilvids.com/api/v1/videos/${widget.videoId}'));
+      final videoResponse = await http
+          .get(Uri.parse('$instanceURL/api/v1/videos/${widget.videoId}'));
       if (videoResponse.statusCode == 200) {
         final videoData = json.decode(videoResponse.body);
         setState(() {
@@ -74,9 +83,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           name = videoData['name'];
           channelName = videoData['channel']['displayName'];
           followerCount = videoData['account']['followersCount'];
-          if (videoData['channel']['avatar'].isNotEmpty) {
+          if (videoData['channel']['avatar'] != null &&
+              videoData['channel']['avatar'].isNotEmpty) {
             channelAvatar = videoData['channel']['avatar']['path'];
           }
+
         });
 
         final playlistUrl = videoData['streamingPlaylists'][0]['playlistUrl'];
@@ -330,7 +341,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                                     children: [
                                       CircleAvatar(
                                         backgroundImage: NetworkImage(
-                                          'https://tilvids.com$channelAvatar',
+                                          '$instanceURL/$channelAvatar',
                                         ),
                                         radius: 20,
                                       ),
