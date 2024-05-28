@@ -71,7 +71,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
           } else {
             channelAvatar = channelData['avatar']['path'];
           }
-          loading = false; 
+          loading = false;
+
+          print('Channel Banner URL: $instanceURL$channelBanner');
+          print('Channel Avatar URL: $instanceURL$channelAvatar');
         });
       } else {
         setState(() {
@@ -137,7 +140,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                               borderRadius: BorderRadius.circular(16.0),
                               child: Image.network(
                                 '$instanceURL$channelBanner',
-                                height: 200,
+                                height: 130,
                                 width: double.infinity,
                                 fit: BoxFit.fill,
                               ),

@@ -85,7 +85,7 @@ Future<void> _loadInstanceURL() async {
           followerCount = videoData['account']['followersCount'];
           if (videoData['channel']['avatar'] != null &&
               videoData['channel']['avatar'].isNotEmpty) {
-            channelAvatar = videoData['channel']['avatar']['path'];
+            channelAvatar = '$instanceURL${videoData['channel']['avatar']['path']}';
           }
 
         });
@@ -341,7 +341,7 @@ Future<void> _loadInstanceURL() async {
                                     children: [
                                       CircleAvatar(
                                         backgroundImage: NetworkImage(
-                                          '$instanceURL/$channelAvatar',
+                                          channelAvatar
                                         ),
                                         radius: 20,
                                       ),
