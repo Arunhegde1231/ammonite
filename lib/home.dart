@@ -1,5 +1,3 @@
-// ignore_for_file: use_key_in_widget_constructors
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +22,7 @@ class _HomescreenState extends State<Homescreen> {
   final PagingController<int, dynamic> _pagingController =
       PagingController(firstPageKey: 0);
   String instanceURL = 'https://tilvids.com';
+  final TextEditingController _instanceURLController = TextEditingController();
 
   @override
   void initState() {
@@ -34,18 +33,24 @@ class _HomescreenState extends State<Homescreen> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadInstanceURL();
-  }
-
   Future<void> _loadInstanceURL() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+      _instanceURLController.text =
+          instanceURL; // Set the initial value for the TextField
     });
-    _pagingController.refresh(); 
+    _pagingController.refresh();
+  }
+
+  Future<void> _setInstanceURL(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('instanceURL', url);
+    setState(() {
+      instanceURL = url;
+    });
+    _pagingController
+        .refresh(); // Refresh the paging controller to reload videos
   }
 
   Future<void> fetchVideos(int pageKey) async {
@@ -74,6 +79,7 @@ class _HomescreenState extends State<Homescreen> {
   @override
   void dispose() {
     _pagingController.dispose();
+    _instanceURLController.dispose();
     super.dispose();
   }
 
@@ -106,7 +112,30 @@ class _HomescreenState extends State<Homescreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Home'),
+          title: PopupMenuButton<int>(
+            onSelected: (value) {},
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                enabled:
+                    false, // Disable interaction to keep the text field usable
+                child: TextField(
+                  controller: _instanceURLController,
+                  decoration: InputDecoration(
+                    labelText: 'Instance URL',
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.save),
+                      onPressed: () async {
+                        await _setInstanceURL(_instanceURLController.text);
+                        Navigator.pop(context); // Close the popup menu
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            child: const Text('Home'),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.settings_outlined),
@@ -160,11 +189,16 @@ class _HomescreenState extends State<Homescreen> {
                         ? channelData['displayName']
                         : '';
 
-                final channelAvatar = channelData != null &&
-                        channelData['avatar'] != null &&
-                        channelData['avatar']['path'] != null
-                    ? '$instanceURL${channelData['avatar']['path']}'
-                    : '';
+                final avatarData = channelData['avatar'];
+                final avatarData2 = channelData['avatars'];
+                final channelAvatar =
+                    avatarData != null && avatarData.isNotEmpty
+                        ? '$instanceURL${avatarData['path']}'
+                        : '';
+                final channelAvatar2 =
+                    avatarData2 != null && avatarData2.isNotEmpty
+                        ? '$instanceURL${avatarData2[1]['path']}'
+                        : '';
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +237,10 @@ class _HomescreenState extends State<Homescreen> {
                           if (channelAvatar.isNotEmpty)
                             CircleAvatar(
                               radius: 20,
-                              backgroundImage: NetworkImage(channelAvatar),
+                              backgroundImage: NetworkImage(
+                                  channelAvatar.isNotEmpty
+                                      ? channelAvatar
+                                      : channelAvatar2),
                             ),
                           const SizedBox(width: 8),
                           Expanded(

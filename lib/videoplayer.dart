@@ -53,13 +53,14 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     _loadInstanceURL();
   }
 
-Future<void> _loadInstanceURL() async {
+  Future<void> _loadInstanceURL() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
     });
-    _fetchVideoData(); 
+    _fetchVideoData();
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -85,9 +86,14 @@ Future<void> _loadInstanceURL() async {
           followerCount = videoData['account']['followersCount'];
           if (videoData['channel']['avatar'] != null &&
               videoData['channel']['avatar'].isNotEmpty) {
-            channelAvatar = '$instanceURL${videoData['channel']['avatar']['path']}';
+            channelAvatar =
+                '$instanceURL${videoData['channel']['avatar']['path']}';
           }
-
+          if (videoData['channel']['avatars'] != null &&
+              videoData['channel']['avatars'].isNotEmpty) {
+            channelAvatar =
+                '$instanceURL${videoData['channel']['avatars'][1]['path']}';
+          }
         });
 
         final playlistUrl = videoData['streamingPlaylists'][0]['playlistUrl'];
@@ -340,9 +346,8 @@ Future<void> _loadInstanceURL() async {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          channelAvatar
-                                        ),
+                                        backgroundImage:
+                                            NetworkImage(channelAvatar),
                                         radius: 20,
                                       ),
                                       const SizedBox(width: 8),

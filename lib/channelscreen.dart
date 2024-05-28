@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
@@ -35,6 +34,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
   String errorMessage = '';
   String instanceURL = 'https://tilvids.com'; // Default instance URL
 
+  final TextEditingController _instanceURLController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -45,8 +46,18 @@ class _ChannelScreenState extends State<ChannelScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       instanceURL = prefs.getString('instanceURL') ?? 'https://tilvids.com';
+      _instanceURLController.text =
+          instanceURL; // Set the initial value for the TextField
     });
     _loadChannelDetails();
+  }
+
+  Future<void> _setInstanceURL(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('instanceURL', url);
+    setState(() {
+      instanceURL = url;
+    });
   }
 
   Future<void> _loadChannelDetails() async {
@@ -58,36 +69,50 @@ class _ChannelScreenState extends State<ChannelScreen> {
         setState(() {
           followerCount = channelData['followersCount'];
           followingCount = channelData['followingCount'];
-          description = channelData['description'];
-          support = channelData['support'];
-          accountURL = channelData['ownerAccount']['url'];
-          if (channelData['banner'].isNotEmpty) {
+          description = channelData['description'] ?? '';
+          support = channelData['support'] ?? '';
+          accountURL = channelData['ownerAccount']?['url'] ?? '';
+
+          if (channelData['banner'] != null &&
+              channelData['banner']['path'] != null) {
             channelBanner = channelData['banner']['path'];
-          } else {
+          } else if (channelData['banners'] != null &&
+              channelData['banners'].isNotEmpty) {
             channelBanner = channelData['banners'][0]['path'];
-          }
-          if (channelData['avatars'].isNotEmpty) {
-            channelAvatar = channelData['avatars'][1]['path'];
           } else {
-            channelAvatar = channelData['avatar']['path'];
+            channelBanner = 'assets/defaultavatarbanner/banner.jpg';
           }
+
+          if (channelData['avatars'] != null &&
+              channelData['avatars'].isNotEmpty) {
+            channelAvatar = channelData['avatars'][1]['path'];
+          } else if (channelData['avatar'] != null &&
+              channelData['avatar']['path'] != null) {
+            channelAvatar = channelData['avatar']['path'];
+          } else {
+            channelAvatar = 'assets/defaultavatarbanner/avatar.jpg';
+          }
+
           loading = false;
 
-          print('Channel Banner URL: $instanceURL$channelBanner');
-          print('Channel Avatar URL: $instanceURL$channelAvatar');
+          if (kDebugMode) {
+            print('Channel Banner URL: $instanceURL$channelBanner');
+            print('Channel Avatar URL: $instanceURL$channelAvatar');
+          }
         });
       } else {
         setState(() {
-          errorMessage = 'Failed to load videos : ${response.statusCode}';
+          errorMessage =
+              'Failed to load channel details: ${response.statusCode}';
           loading = false;
         });
       }
     } catch (err) {
       if (kDebugMode) {
-        print('Error in fetching videos: $err');
+        print('Error in fetching channel details: $err');
       }
       setState(() {
-        errorMessage = 'Failed to load videos : $err';
+        errorMessage = 'Failed to load channel details: $err';
         loading = false;
       });
     }
@@ -95,10 +120,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accentcolor = SystemTheme.accentColor.accent;
-    int r = accentcolor.red;
-    int g = accentcolor.green;
-    int b = accentcolor.blue;
+    final accentColor = SystemTheme.accentColor.accent;
+    int r = accentColor.red;
+    int g = accentColor.green;
+    int b = accentColor.blue;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -133,17 +158,41 @@ class _ChannelScreenState extends State<ChannelScreen> {
                     onRefresh: _loadChannelDetails,
                     child: ListView(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: _instanceURLController,
+                            decoration: InputDecoration(
+                              labelText: 'Instance URL',
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.save),
+                                onPressed: () async {
+                                  await _setInstanceURL(
+                                      _instanceURLController.text);
+                                  _loadChannelDetails(); // Reload details with the new instance URL
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                         if (channelBanner.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16.0),
-                              child: Image.network(
-                                '$instanceURL$channelBanner',
-                                height: 130,
-                                width: double.infinity,
-                                fit: BoxFit.fill,
-                              ),
+                              child: channelBanner.startsWith('assets')
+                                  ? Image.asset(
+                                      channelBanner,
+                                      height: 130,
+                                      width: double.infinity,
+                                      fit: BoxFit.fill,
+                                    )
+                                  : Image.network(
+                                      '$instanceURL$channelBanner',
+                                      height: 130,
+                                      width: double.infinity,
+                                      fit: BoxFit.fill,
+                                    ),
                             ),
                           ),
                         Padding(
@@ -152,9 +201,12 @@ class _ChannelScreenState extends State<ChannelScreen> {
                             children: [
                               if (channelAvatar.isNotEmpty)
                                 CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                    '$instanceURL$channelAvatar',
-                                  ),
+                                  backgroundImage:
+                                      channelAvatar.startsWith('assets')
+                                          ? AssetImage(channelAvatar)
+                                          : NetworkImage(
+                                                  '$instanceURL$channelAvatar')
+                                              as ImageProvider,
                                   radius: 30,
                                 ),
                               SizedBox(width: 10),
