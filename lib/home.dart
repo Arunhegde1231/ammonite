@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -112,6 +113,14 @@ class _HomescreenState extends State<Homescreen> {
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              child: Container(
+                color: Colors.transparent ,
+              ),
+            ),
+          ),
           title: PopupMenuButton<int>(
             onSelected: (value) {},
             itemBuilder: (context) => [

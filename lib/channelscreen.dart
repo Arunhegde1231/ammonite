@@ -155,7 +155,28 @@ class _ChannelScreenState extends State<ChannelScreen>
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
-          title: Text(widget.channelDisplayName),
+          title: PopupMenuButton<int>(
+              onSelected: (value) {},
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 1,
+                      enabled: false,
+                      child: TextField(
+                        controller: _instanceURLController,
+                        decoration: InputDecoration(
+                            labelText: 'Instance URL',
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.save),
+                              onPressed: () async {
+                                await _setInstanceURL(
+                                    _instanceURLController.text);
+                                Navigator.pop(context);
+                              },
+                            )),
+                      ),
+                    )
+                  ],
+              child: Text(widget.channelDisplayName)),
           bottom: TabBar(
             controller: tabController,
             tabs: const [
@@ -173,23 +194,6 @@ class _ChannelScreenState extends State<ChannelScreen>
                     onRefresh: _loadChannelDetails,
                     child: ListView(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
-                            controller: _instanceURLController,
-                            decoration: InputDecoration(
-                              labelText: 'Instance URL',
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.save),
-                                onPressed: () async {
-                                  await _setInstanceURL(
-                                      _instanceURLController.text);
-                                  _loadChannelDetails();
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
                         if (channelBanner.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
