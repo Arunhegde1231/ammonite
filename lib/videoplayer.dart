@@ -104,6 +104,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             });
           });
         _chewieController = ChewieController(
+          allowPlaybackSpeedChanging:false,
           allowFullScreen: true,
           allowedScreenSleep: true,
           allowMuting: true,

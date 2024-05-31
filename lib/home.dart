@@ -145,8 +145,7 @@ class _HomescreenState extends State<Homescreen> {
                   MaterialPageRoute(
                     builder: (context) => const SettingsScreen(),
                   ),
-                ).then((_) =>
-                    _loadInstanceURL()); // Refresh instance URL on return
+                ).then((_) => _loadInstanceURL());
               },
             ),
             PopupMenuButton(
@@ -164,8 +163,7 @@ class _HomescreenState extends State<Homescreen> {
                     MaterialPageRoute(
                       builder: ((context) => const SettingsScreen()),
                     ),
-                  ).then((_) =>
-                      _loadInstanceURL()); // Refresh instance URL on return
+                  ).then((_) => _loadInstanceURL());
                 }
               },
             ),

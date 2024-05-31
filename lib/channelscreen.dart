@@ -21,7 +21,8 @@ class ChannelScreen extends StatefulWidget {
   State<ChannelScreen> createState() => _ChannelScreenState();
 }
 
-class _ChannelScreenState extends State<ChannelScreen> {
+class _ChannelScreenState extends State<ChannelScreen>
+    with SingleTickerProviderStateMixin {
   int followerCount = 0;
   int followingCount = 0;
   String description = '';
@@ -29,10 +30,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
   String accountURL = '';
   String channelBanner = '';
   String channelAvatar = '';
+  String createdAt = '';
+  String CreatedDate = '';
   List<dynamic> videos = [];
   bool loading = true;
   String errorMessage = '';
   String instanceURL = 'https://tilvids.com'; // Default instance URL
+  late TabController tabController;
 
   final TextEditingController _instanceURLController = TextEditingController();
 
@@ -40,6 +44,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
   void initState() {
     super.initState();
     _loadInstanceURL();
+    tabController = TabController(length: 2, vsync: this);
   }
 
   Future<void> _loadInstanceURL() async {
@@ -69,6 +74,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
         setState(() {
           followerCount = channelData['followersCount'];
           followingCount = channelData['followingCount'];
+          createdAt = channelData['createdAt'];
+          CreatedDate = createdAt.substring(0, 9);
           description = channelData['description'] ?? '';
           support = channelData['support'] ?? '';
           accountURL = channelData['ownerAccount']?['url'] ?? '';
@@ -149,9 +156,17 @@ class _ChannelScreenState extends State<ChannelScreen> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(widget.channelDisplayName),
+          bottom: TabBar(
+            controller: tabController,
+            tabs: const [
+              Tab(text: 'Videos'),
+              Tab(text: 'Playlists'),
+            ],
+            labelColor: Colors.black,
+          ),
         ),
         body: loading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : errorMessage.isNotEmpty
                 ? Center(child: Text(errorMessage))
                 : RefreshIndicator(
@@ -165,11 +180,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
                             decoration: InputDecoration(
                               labelText: 'Instance URL',
                               suffixIcon: IconButton(
-                                icon: Icon(Icons.save),
+                                icon: const Icon(Icons.save),
                                 onPressed: () async {
                                   await _setInstanceURL(
                                       _instanceURLController.text);
-                                  _loadChannelDetails(); // Reload details with the new instance URL
+                                  _loadChannelDetails();
                                 },
                               ),
                             ),
@@ -209,7 +224,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                                               as ImageProvider,
                                   radius: 30,
                                 ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -227,6 +242,99 @@ class _ChannelScreenState extends State<ChannelScreen> {
                                           .textTheme
                                           .labelLarge,
                                     ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              IntrinsicWidth(
+                                child: Card(
+                                  surfaceTintColor: Colors.amber,
+                                  elevation: 8.0,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 5),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                '$followerCount',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall,
+                                              ),
+                                              Text(
+                                                'Followers',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const VerticalDivider(
+                                          width: 15.0,
+                                          thickness: 15.0,
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 5),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                '$followingCount',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall,
+                                              ),
+                                              Text(
+                                                'Following',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 300,
+                          child: TabBarView(
+                            controller: tabController,
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(),
                                   ),
                                 ],
                               ),
