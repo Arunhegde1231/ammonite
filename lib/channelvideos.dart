@@ -1,117 +1,187 @@
-/*import 'dart:convert';
-
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:system_theme/system_theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'videoplayer.dart';
 
-const List<String> selection = <String>['Videos', 'Playlists'];
-const int pageSize = 10;
+const int pageSize = 50;
 
-class ChannelVideos extends StatefulWidget {
+class ChannelVideoScreen extends StatefulWidget {
   final String channelName;
-  final String channelDisplayName;
+  final String instanceURL;
+  final PagingController<int, dynamic> pagingController;
 
-  const ChannelVideos({
+  const ChannelVideoScreen({
     Key? key,
     required this.channelName,
-    required this.channelDisplayName,
-  });
+    required this.instanceURL,
+    required this.pagingController,
+  }) : super(key: key);
+
   @override
-  State<ChannelVideos> createState() => _ChannelVideosState();
+  _ChannelVideoScreenState createState() => _ChannelVideoScreenState();
 }
 
-class _ChannelVideosState extends State<ChannelVideos> {
-  List<dynamic> videos = [];
-  bool loading = true;
-  String errorMessage = '';
-  final ScrollController _scrollController = ScrollController();
-  final PagingController<int, dynamic> _pagingController =
-      PagingController(firstPageKey: 0);
-  bool _isVisible = true;
-
+class _ChannelVideoScreenState extends State<ChannelVideoScreen> {
+  @override
   void initState() {
     super.initState();
-    _pagingController.addPageRequestListener((pageKey) {
-      fetchChannelVideos(pageKey);
+    widget.pagingController.addPageRequestListener((pageKey) {
+      _fetchChannelVideos(pageKey);
     });
   }
 
-  Future<void> fetchChannelVideos(int pageKey) async {
+  Future<void> _fetchChannelVideos(int pageKey) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://tilvids.com/api/v1/video-channels/${widget.channelName}/videos?start=$pageKey&&count=$pageSize}'));
+          '${widget.instanceURL}/api/v1/video-channels/${widget.channelName}/videos?start=$pageKey&count=$pageSize'));
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final List<dynamic> videosList = responseData['data'];
-        final isLastPage = videosList.length < pageSize;
+        final videoData = json.decode(response.body);
+        final List<dynamic> newVideos = videoData['data'];
+        final isLastPage = newVideos.length < pageSize;
         if (isLastPage) {
-          _pagingController.appendLastPage(videosList);
+          widget.pagingController.appendLastPage(newVideos);
         } else {
           final nextPageKey = pageKey + pageSize;
-          _pagingController.appendPage(videosList, nextPageKey);
+          widget.pagingController.appendPage(newVideos, nextPageKey);
         }
       } else {
-        _pagingController.error = 'Failed to load ${response.statusCode}';
+        widget.pagingController.error =
+            'Failed to load videos: ${response.statusCode}';
       }
-    } catch (err) {
-      _pagingController.error = 'error fetching videos $err';
+    } catch (error) {
+      widget.pagingController.error = 'Failed to load videos: $error';
     }
   }
 
   @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final accentcolor = SystemTheme.accentColor.accent;
-    int r = accentcolor.red;
-    int g = accentcolor.green;
-    int b = accentcolor.blue;
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromARGB(255, r, g, b),
-          brightness: Brightness.light,
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 72,
-            fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () => Future.sync(() => widget.pagingController.refresh()),
+        child: PagedListView<int, dynamic>(
+          pagingController: widget.pagingController,
+          builderDelegate: PagedChildBuilderDelegate<dynamic>(
+            itemBuilder: (context, video, index) {
+              final thumbnailURL = video['previewPath'] != null
+                  ? '${widget.instanceURL}${video['previewPath']}'
+                  : '';
+
+              final channelData = video['channel'];
+              final channelName =
+                  channelData != null && channelData['displayName'] != null
+                      ? channelData['displayName']
+                      : '';
+
+              final avatarData = channelData['avatar'];
+              final avatarData2 = channelData['avatars'];
+              final channelAvatar = avatarData != null && avatarData.isNotEmpty
+                  ? '${widget.instanceURL}${avatarData['path']}'
+                  : '';
+              final channelAvatar2 =
+                  avatarData2 != null && avatarData2.isNotEmpty
+                      ? '${widget.instanceURL}${avatarData2[1]['path']}'
+                      : '';
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      final videoUrl = video['url'];
+                      final videoId = video['id'];
+                      if (videoUrl is String) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPlayerPage(
+                              videoId: videoId,
+                              videoUrl: videoUrl,
+                            ),
+                          ),
+                        );
+                      } else {
+                        if (kDebugMode) {
+                          print('Invalid video URL');
+                        }
+                      }
+                    },
+                    child: Image.network(
+                      thumbnailURL,
+                      width: double.maxFinite,
+                      height: 240,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 6),
+                    child: Row(
+                      children: [
+                        if (channelAvatar.isNotEmpty)
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(
+                              channelAvatar.isNotEmpty
+                                  ? channelAvatar
+                                  : channelAvatar2,
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                video['name'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'RobotoMono',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                              const SizedBox(height: 2),
+                              if (channelName.isNotEmpty)
+                                Text(
+                                  '$channelName',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 53, top: 6),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.thumb_up_outlined),
+                        const SizedBox(width: 6),
+                        Text('${video['likes'] ?? 0}'),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.thumb_down_outlined),
+                        const SizedBox(width: 6),
+                        Text('${video['dislikes'] ?? 0}'),
+                        const SizedBox(width: 8),
+                        const Text('•'),
+                        const SizedBox(width: 8),
+                        Text('${video['views'] ?? 0} Views'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            },
           ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromARGB(255, r, g, b),
-          brightness: Brightness.dark,
-        ),
-      ),
-      themeMode: ThemeMode.system,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(''),
-        ),
-        body: RefreshIndicator(
-          onRefresh: () => Future.sync(
-            () => _pagingController.refresh(),
-          ),
-          child: PagedListView<int, dynamic>(
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<dynamic>(
-                  itemBuilder: (context, video, index) {
-                final thumbnailURL = video[''];
-              })),
         ),
       ),
     );
   }
 }
-*/

@@ -1,13 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:convert';
+import 'package:ammonite/channelvideos.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 const List<String> selection = <String>['Videos', 'Playlists'];
+int pageSize = 15;
 
 class ChannelScreen extends StatefulWidget {
   const ChannelScreen({
@@ -40,12 +43,18 @@ class _ChannelScreenState extends State<ChannelScreen>
   String instanceURL = 'https://tilvids.com'; // Default instance URL
   late TabController tabController;
 
+  final PagingController<int, dynamic> _pagingController =
+      PagingController(firstPageKey: 0);
+
   final TextEditingController _instanceURLController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadInstanceURL();
+    _pagingController.addPageRequestListener((pageKey) {
+      fetchChannelVideos(pageKey);
+    });
     tabController = TabController(length: 2, vsync: this);
   }
 
@@ -124,6 +133,29 @@ class _ChannelScreenState extends State<ChannelScreen>
         errorMessage = 'Failed to load channel details: $err';
         loading = false;
       });
+    }
+  }
+
+  Future<void> fetchChannelVideos(int pageKey) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '$instanceURL/api/v1/video-channels/${widget.channelName}/videos?start=${pageKey * pageSize}&count=$pageSize'));
+      if (response.statusCode == 200) {
+        final videoData = json.decode(response.body);
+        final List<dynamic> newVideos = videoData['data'];
+        final isLastPage = newVideos.length < pageSize;
+        if (isLastPage) {
+          _pagingController.appendLastPage(newVideos);
+        } else {
+          final nextPageKey = pageKey + 1;
+          _pagingController.appendPage(newVideos, nextPageKey);
+        }
+      } else {
+        _pagingController.error =
+            'Failed to load videos: ${response.statusCode}';
+      }
+    } catch (error) {
+      _pagingController.error = 'Failed to load videos: $error';
     }
   }
 
@@ -293,7 +325,7 @@ class _ChannelScreenState extends State<ChannelScreen>
                                         ),
                                         const VerticalDivider(
                                           width: 15.0,
-                                          thickness: 15.0,
+                                          thickness: 1.0,
                                         ),
                                         Container(
                                           padding: const EdgeInsets.symmetric(
@@ -327,22 +359,14 @@ class _ChannelScreenState extends State<ChannelScreen>
                           height: 300,
                           child: TabBarView(
                             controller: tabController,
-                            children: const [
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Column(),
-                                  ),
-                                ],
+                            children: [
+                              ChannelVideoScreen(
+                                channelName: widget.channelName,
+                                instanceURL: instanceURL,
+                                pagingController: _pagingController,
                               ),
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Column(),
-                                  ),
-                                ],
+                              const Center(
+                                child: Text('Playlists'),
                               ),
                             ],
                           ),

@@ -133,7 +133,7 @@ class _HomescreenState extends State<Homescreen> {
                   decoration: InputDecoration(
                     labelText: 'Instance URL',
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.save),
+                      icon: const Icon(Icons.save),
                       onPressed: () async {
                         await _setInstanceURL(_instanceURLController.text);
                         Navigator.pop(context); // Close the popup menu
@@ -147,7 +147,7 @@ class _HomescreenState extends State<Homescreen> {
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.settings_outlined),
+              icon: const Icon(Icons.settings_outlined),
               onPressed: () {
                 Navigator.push(
                   context,
