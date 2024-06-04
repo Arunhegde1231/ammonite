@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +11,10 @@ const List<String> selection = <String>['Videos', 'Playlists'];
 
 class ChannelScreen extends StatefulWidget {
   const ChannelScreen({
-    Key? key,
+    super.key,
     required this.channelDisplayName,
     required this.channelName,
-  }) : super(key: key);
+  });
 
   final String channelDisplayName;
   final String channelName;
@@ -166,7 +168,7 @@ class _ChannelScreenState extends State<ChannelScreen>
                         decoration: InputDecoration(
                             labelText: 'Instance URL',
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.save),
+                              icon: const Icon(Icons.save),
                               onPressed: () async {
                                 await _setInstanceURL(
                                     _instanceURLController.text);
@@ -325,11 +327,11 @@ class _ChannelScreenState extends State<ChannelScreen>
                           height: 300,
                           child: TabBarView(
                             controller: tabController,
-                            children: [
+                            children: const [
                               Column(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: EdgeInsets.all(8.0),
                                     child: Column(),
                                   ),
                                 ],
@@ -337,7 +339,7 @@ class _ChannelScreenState extends State<ChannelScreen>
                               Column(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: EdgeInsets.all(8.0),
                                     child: Column(),
                                   ),
                                 ],
